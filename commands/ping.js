@@ -5,7 +5,7 @@ exports.default = {
     description: 'Replies with pong',
     slash: 'both',
     testOnly: true,
-    callback: function (_a) {
+    callback: ({}) => {
         return 'Pong';
     },
 };

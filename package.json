@@ -5,14 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc" : "tsc -w --skiplibCheck"
+    "dev": "nodemon index.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^13.1.0",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "wokcommands": "^1.3.983"
   },
   "devDependencies": {
     "typescript": "^4.4.3"
