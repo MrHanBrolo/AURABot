@@ -1,4 +1,4 @@
-import { ButtonInteraction, Interaction, MessageActionRow, MessageButton, MessageEmbed} from "discord.js";
+import { ButtonInteraction, Interaction, MessageActionRow, MessageButton, MessageEmbed, Permissions} from "discord.js";
 import { ICommand } from "wokcommands";
 
 export default {
@@ -69,6 +69,8 @@ export default {
     ],
 
     callback: async ({ interaction: msgInt, channel }) => {
+
+             
             const punishRow = new MessageActionRow()
             
             .addComponents(
@@ -85,7 +87,7 @@ export default {
             )
     
         await msgInt.reply({
-            content: 'Are you sure you want to ?',
+            content: 'Are you sure?',
             components: [punishRow],
             ephemeral: true
             })
@@ -101,44 +103,83 @@ export default {
             })
     
             collector.on('end', async (collection) => {
-                collection.forEach((click) => {
+                collection.forEach(() => {
                 })
                 if (collection.first()?.customId === 'punish_yes'){
-                    //ban the target user
-                    const member = msgInt.options.getUser('user', true)
+                    // Check user perms
+                    const punished = msgInt.options.getUser('user', true)
+                    const rsn = msgInt.options.getString('reason', false) as string
+                    const kicker = msgInt.user.tag
 
-                    const rsnForKick = msgInt.options.getString('reason', false) as string
+                    const punishedEmbed = new MessageEmbed()
+                    .setColor('#76b900')
+                    .setAuthor(`Action performed by: ${kicker}`)
+                    .setTimestamp()
+                    .setFooter('Remember to behave!')
 
+                    //Kicks the target user
+                    //Gets the user
+
+                    switch(msgInt.options.getSubcommand()){
+                    
+                    case ('kick'):
+
+                    //Tries to DM user and sends reason if provided - continues if not
                     try {
-                        await member.send(`You have been kicked from the test server because: ${rsnForKick}`)
+                        await punished.send(`You have been kicked from the test server because: ${rsn}`)
                     } catch (err) {
                         console.log('User kicked but unable to DM')
                     }               
-
-                        await msgInt.guild?.members.kick(member).then(async () =>{
-                            const kicker = msgInt.user.tag
-                            const punishedEmbed = new MessageEmbed()
-                            .setColor('#76b900')
-                            .setTitle('User was kicked')
-                            .setAuthor(`${kicker}`)
-                            .setDescription(`${member} was kicked from the server`)
-                            .setTimestamp()
-                            .setFooter('Remember to behave!')
-
-                            if(rsnForKick){
-                                punishedEmbed.addField('Reason for kicking', `${rsnForKick}`)
+                        //Waits for member kick then sends embed giving details
+                        await msgInt.guild?.members.kick(punished).then(async () =>{
+                            punishedEmbed.setTitle('User was kicked')
+                            punishedEmbed.setDescription(`${punished} was kicked from the server`)
+                            //if a reason is included, else none
+                            if(rsn){
+                                punishedEmbed.addField('Reason for kicking', `${rsn}`)
                                 channel.send({embeds: [punishedEmbed]})
                             } else {
                                 punishedEmbed.addField('Reason for kicking', 'No reason given')
                                 channel.send({embeds: [punishedEmbed]})
                                 }
+
+                                await  msgInt.editReply({
+                                    content: 'Completed.',
+                                    components: []
+                                });
                         })
-                        msgInt.editReply({
-                            content: 'Completed.',
-                            components: []
-                        })
+                        return
+
+                        case('ban'):
+                        try {
+                            await punished.send(`You have been banned from the test server because: ${rsn}`)
+                        } catch (err) {
+                            console.log('User BANNED but unable to DM')
+                        }               
+                            //Waits for member kick then sends embed giving details
+                            await msgInt.guild?.members.ban(punished).then(async () =>{
+                                punishedEmbed.setTitle('User was banned')
+                                punishedEmbed.setDescription(`${punished} was banned from the server`)
+                                //if a reason is included, else none
+                                if(rsn){
+                                    punishedEmbed.addField('Reason for Ban', `${rsn}`)
+                                    channel.send({embeds: [punishedEmbed]})
+                                } else {
+                                    punishedEmbed.addField('Reason for Ban', 'No reason given')
+                                    channel.send({embeds: [punishedEmbed]})
+                                    }
+                            })
+
+                                await  msgInt.editReply({
+                                    content: 'Completed.',
+                                    components: []
+                                });
+
+                            return
+
                     }
-                
+                }
+                    // Cancel message if user chickens out
                     else if (collection.first()?.customId === 'punish_no'){
                     msgInt.editReply({
                         content: 'Action cancelled',

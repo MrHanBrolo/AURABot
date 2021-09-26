@@ -13,16 +13,16 @@ const discord_js_1 = require("discord.js");
 exports.default = {
     category: 'Testing',
     description: 'Testing',
-    slash: 'both',
+    slash: "both",
     testOnly: true,
-    callback: ({ message, channel }) => __awaiter(void 0, void 0, void 0, function* () {
-        const filter = m => m.author.id === message.author.id;
+    callback: ({ interaction: message, channel }) => __awaiter(void 0, void 0, void 0, function* () {
+        const filter = m => m.author.id === message.user.id;
         let answered = true;
         //create embed for application...creation
         const appealEmbed = new discord_js_1.MessageEmbed()
             .setColor('#76b900')
             .setTitle('Ban Appeal')
-            .setAuthor(message.author.tag)
+            .setAuthor(message.user.id)
             .setDescription('Testing, attention please')
             .setThumbnail('https://img.ibxk.com.br/2020/02/04/04155339211586.jpg?w=1120&h=420&mode=crop&scale=both');
         //create embed for application timeout
@@ -34,8 +34,8 @@ exports.default = {
             //Function to ask question for appeal form
             function askQuestion(question, formResponse, timer, isNumber) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    yield channel.send(`**${question}**`);
-                    //wait for message send, filter to command caller ID
+                    const botMsg = yield channel.send(`**${question}**`);
+                    //wait for message send, filter to command caller ID  
                     const collected = yield channel.awaitMessages({ filter, max: 1, idle: timer, errors: ['idle'] });
                     //collect first message sent after question, add field to embed
                     const response = collected.first();
@@ -43,11 +43,15 @@ exports.default = {
                     switch (true) {
                         case (reply === "cancel"):
                             throw "is cancelled";
-                        case (isNumber && isNaN(Number(reply)) && reply !== "cancel"):
+                        case (isNumber && isNaN(Number(reply)) === true && reply !== "cancel"):
                             throw "not a number";
+                        case (isNumber === false && isNaN(Number(reply)) === false && reply !== "cancel"):
+                            throw "not appropriate response";
                         case (reply !== "cancel"):
                             appealEmbed.addField(`**${formResponse}**`, reply);
                             updatedEmbed.edit({ embeds: [appealEmbed] });
+                            botMsg.delete();
+                            response === null || response === void 0 ? void 0 : response.delete();
                     }
                 });
             }
@@ -63,10 +67,15 @@ exports.default = {
                     timeoutEmbed.setDescription("**Application has been cancelled successfully**");
                     channel.send({ embeds: [timeoutEmbed] });
                 }
+                else if (!answered && error === "not appropriate response") {
+                    console.log("Input not a string, application cancelled.");
+                    timeoutEmbed.setDescription("**Input is not a valid response! Don't use numbers.**");
+                    channel.send({ embeds: [timeoutEmbed] });
+                }
                 //if answered is false && error is user idle time, apply cancellation embed
                 else {
                     console.log("Application timeout");
-                    timeoutEmbed.setDescription(`**${message.author.tag}**` + " " + "**took too long!**"),
+                    timeoutEmbed.setDescription(`**${message.user.id}**` + " " + "**took too long!**"),
                         channel.send({ embeds: [timeoutEmbed] });
                 }
             }));
@@ -83,9 +92,14 @@ exports.default = {
                     timeoutEmbed.setDescription("**Application has been cancelled successfully**");
                     channel.send({ embeds: [timeoutEmbed] });
                 }
+                else if (!answered && error === "not appropriate response") {
+                    console.log("Input not a string, application cancelled.");
+                    timeoutEmbed.setDescription("**Input is not a valid response! Don't use numbers.**");
+                    channel.send({ embeds: [timeoutEmbed] });
+                }
                 else {
                     console.log("Application timeout");
-                    timeoutEmbed.setDescription(`**${message.author.tag}**` + " " + "**took too long!**"),
+                    timeoutEmbed.setDescription(`**${message.user.id}**` + " " + "**took too long!**"),
                         channel.send({ embeds: [timeoutEmbed] });
                 }
             }));
@@ -101,9 +115,14 @@ exports.default = {
                     timeoutEmbed.setDescription("**Application has been cancelled successfully**");
                     channel.send({ embeds: [timeoutEmbed] });
                 }
+                else if (!answered && error === "not appropriate response") {
+                    console.log("Input not a string, application cancelled.");
+                    timeoutEmbed.setDescription("**Input is not a valid response! Don't use numbers.**");
+                    channel.send({ embeds: [timeoutEmbed] });
+                }
                 else {
                     console.log("Application timeout");
-                    timeoutEmbed.setDescription(`**${message.author.tag}**` + " " + "**took too long!**"),
+                    timeoutEmbed.setDescription(`**${message.user.id}**` + " " + "**took too long!**"),
                         channel.send({ embeds: [timeoutEmbed] });
                 }
             }));
@@ -127,7 +146,7 @@ exports.default = {
                 }
                 else {
                     console.log("Application timeout");
-                    timeoutEmbed.setDescription(`**${message.author.tag}**` + " " + "**took too long!**"),
+                    timeoutEmbed.setDescription(`**${message.user.id}**` + " " + "**took too long!**"),
                         channel.send({ embeds: [timeoutEmbed] });
                 }
             }));
@@ -141,11 +160,16 @@ exports.default = {
                 if (!answered && error === "is cancelled") {
                     console.log("Application cancelled by user");
                     timeoutEmbed.setDescription("**Application has been cancelled successfully**");
-                    message.channel.send({ embeds: [timeoutEmbed] });
+                    channel.send({ embeds: [timeoutEmbed] });
+                }
+                else if (!answered && error === "not appropriate response") {
+                    console.log("Input not a string, application cancelled.");
+                    timeoutEmbed.setDescription("**Input is not a valid response! Don't use numbers.**");
+                    channel.send({ embeds: [timeoutEmbed] });
                 }
                 else {
                     console.log("Application timeout");
-                    timeoutEmbed.setDescription(`**${message.author.tag}**` + " " + "**took too long!**"),
+                    timeoutEmbed.setDescription(`**${message.user.id}**` + " " + "**took too long!**"),
                         channel.send({ embeds: [timeoutEmbed] });
                 }
             }));
@@ -161,9 +185,14 @@ exports.default = {
                     timeoutEmbed.setDescription("**Application has been cancelled successfully**");
                     channel.send({ embeds: [timeoutEmbed] });
                 }
+                else if (!answered && error === "not appropriate response") {
+                    console.log("Input not a string, application cancelled.");
+                    timeoutEmbed.setDescription("**Input is not a valid response! Don't use numbers.**");
+                    channel.send({ embeds: [timeoutEmbed] });
+                }
                 else {
                     console.log("Application timeout");
-                    timeoutEmbed.setDescription(`**${message.author.tag}**` + " " + "**took too long!**"),
+                    timeoutEmbed.setDescription(`**${message.user.id}**` + " " + "**took too long!**"),
                         channel.send({ embeds: [timeoutEmbed] });
                 }
             }));
@@ -171,8 +200,7 @@ exports.default = {
                 return;
             }
             ;
+            message.reply("**Application submitted, thank you. We'll review it over the next 14 days.**");
         }));
-        channel.send({ embeds: [appealEmbed] });
-        message.reply("**Application submitted, thank you. We'll review it over the next 14 days.**");
     })
 };

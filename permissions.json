@@ -1,0 +1,9 @@
+{
+    "permissions": [
+        {
+            "id": "MODERATOR_ROLE_ID",
+            "type": 1,
+            "permission": true
+        }
+    ]
+}
