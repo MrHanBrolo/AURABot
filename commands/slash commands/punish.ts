@@ -110,6 +110,7 @@ export default {
                     const punished = msgInt.options.getUser('user', true)
                     const rsn = msgInt.options.getString('reason', false) as string
                     const kicker = msgInt.user.tag
+                    const punishment = msgInt.options.getSubcommand()
 
                     const punishedEmbed = new MessageEmbed()
                     .setColor('#76b900')
@@ -117,21 +118,24 @@ export default {
                     .setTimestamp()
                     .setFooter('Remember to behave!')
 
-                    //Kicks the target user
-                    //Gets the user
-
-                    switch(msgInt.options.getSubcommand()){
-                    
-                    case ('kick'):
-
-                    //Tries to DM user and sends reason if provided - continues if not
+                    //Checks if specified user is bot and throws error
                     try {
-                        await punished.send(`You have been kicked from the test server because: ${rsn}`)
-                    } catch (err) {
-                        console.log('User kicked but unable to DM')
-                    }               
-                        //Waits for member kick then sends embed giving details
+                        if(punished.id === "889924119708196916"){
+                                throw `You can't ${punishment} me!`
+                        }
+                    switch(punishment){
+                    case ('kick'):
+                    //Tries to DM user and sends reason if provided - continues if not
+                        try {
+                            await punished.send(`You have been kicked from the test server because: ${rsn}`)
+                        } catch (err) {
+                            console.log('Unable to DM user reason')
+                        }               
+                            //Waits for member kick then sends embed giving details
+
+
                         await msgInt.guild?.members.kick(punished).then(async () =>{
+
                             punishedEmbed.setTitle('User was kicked')
                             punishedEmbed.setDescription(`${punished} was kicked from the server`)
                             //if a reason is included, else none
@@ -147,15 +151,16 @@ export default {
                                     content: 'Completed.',
                                     components: []
                                 });
+                                return
                         })
                         return
 
                         case('ban'):
-                        try {
-                            await punished.send(`You have been banned from the test server because: ${rsn}`)
-                        } catch (err) {
-                            console.log('User BANNED but unable to DM')
-                        }               
+                            try {
+                                await punished.send(`You have been banned from the test server because: ${rsn}`)
+                            } catch (err) {
+                                console.log('User BANNED but unable to DM')
+                            }               
                             //Waits for member kick then sends embed giving details
                             await msgInt.guild?.members.ban(punished).then(async () =>{
                                 punishedEmbed.setTitle('User was banned')
@@ -169,14 +174,14 @@ export default {
                                     channel.send({embeds: [punishedEmbed]})
                                     }
                             })
-
-                                await  msgInt.editReply({
-                                    content: 'Completed.',
-                                    components: []
-                                });
-
-                            return
-
+                        } 
+                    }  catch (error) {
+                        if(error === `You can't ${punishment} me!`){
+                            msgInt.editReply({
+                                content: `You can't ${punishment} me!`,
+                                components: []
+                            })
+                        }
                     }
                 }
                     // Cancel message if user chickens out
