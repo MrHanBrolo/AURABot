@@ -1,5 +1,4 @@
 import DiscordJS, {Intents} from 'discord.js'
-import { Guild } from 'discord.js'
 import WOKCommands from 'wokcommands'
 import path from 'path'
 import dotenv from 'dotenv'
@@ -15,21 +14,30 @@ const client = new DiscordJS.Client({
 })
 
 client.on('ready', () => {
-client.guilds.cache.get('889924333387005992')
     new WOKCommands(client, {
       commandsDir: path.join(__dirname, 'commands/'),
       typeScript: true,
       ignoreBots: true,
-      testServers: ['889924333387005992']
+      testServers: ['889924333387005992'],
+      mongoUri: process.env.MONGO_URI
     })
   })
 
+  // client.on('guildCreate', () => {
 
-  client.on('guildMemberRemove', async member => {
-    const fetchedLogs = await member.guild.fetchAuditLogs({
-      limit: 1,
-      type: 'MEMBER_KICK',
-    });
-  })
+    //const muted = msgInt.guild?.roles.cache.find(role => role.name === "muted");
+
+    // Create role if muted doesn't exist
+  //   if(!muted){
+  //       await msgInt.guild?.roles.create({
+  //           name: 'muted',
+  //           color: '#8E8E8E',
+  //           hoist: false,
+  //           permissions: ['VIEW_CHANNEL'],
+  //           position: 20,
+  //           reason: 'Muted role did not exist.'
+  //       })
+  //     }
+  //   })
 
 client.login(process.env.TOKEN)
