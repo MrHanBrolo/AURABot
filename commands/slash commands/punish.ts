@@ -399,7 +399,7 @@ export default {
             } catch (error) {
                 if(error instanceof TypeError && error.name === "TypeError [COMMAND_INTERACTION_OPTION_EMPTY]"){
                     msgInt.editReply({
-                        content: 'User does not exist.',
+                        content: 'User is not in guild.',
                         components: []
                     })
                 }
