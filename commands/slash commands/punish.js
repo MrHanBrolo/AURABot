@@ -122,10 +122,6 @@ exports.default = {
                         .setAuthor(`Action performed by: ${kicker}`)
                         .setTimestamp()
                         .setFooter('Remember to behave!');
-                    //IMPORTANT !!! //
-                    // if(punished === null){
-                    // throw 'User is not in server.'
-                    //} 
                     //Checks if specified user is able to be punished and exists in the server
                     try {
                         if (!punished.kickable || !punished.bannable) {
@@ -173,25 +169,61 @@ exports.default = {
                                 if (punished.roles.cache.some(role => role.name === 'muted')) {
                                     throw `already ${punishment}ed`;
                                 }
-                                try {
-                                    punishedEmbed.setTitle('You were muted');
-                                    punishedEmbed.setDescription(`You were muted on the server.`);
-                                    yield (punished === null || punished === void 0 ? void 0 : punished.send(({ embeds: [punishedEmbed] })));
-                                }
-                                catch (err) {
-                                    console.log('Unable to DM user reason.');
-                                }
                                 if (time) {
+                                    /////////////// WRONG INPUT CHECKING
                                     const timed = time.toLowerCase();
                                     const search = timed.match(/(\d+|[^\d]+)/g);
+                                    const defaultTime = search[1].split("");
+                                    const letter = new Array('h', 'd', 'm');
+                                    const nolength = letter.some((i) => defaultTime === null || defaultTime === void 0 ? void 0 : defaultTime.includes(i));
+                                    console.log('initial array...[time, day/m/h]');
+                                    console.log(search);
+                                    console.log('splitting 1st index [s,p,l,i,t]...');
+                                    console.log(defaultTime);
+                                    console.log('checking if length of time exists in array...');
+                                    console.log(nolength);
+                                    if (nolength) {
+                                        console.log('finding indexes...');
+                                        const day = yield defaultTime.indexOf('h');
+                                        const hour = yield defaultTime.indexOf('m');
+                                        const minute = yield defaultTime.indexOf('d');
+                                        const arr = new Array(day, hour, minute);
+                                        console.log(arr);
+                                        for (var i = arr.length - 1; i >= 0; i--) {
+                                            if (arr[i] < 0) {
+                                                console.log('Checking negatives and removing');
+                                                arr[i] = arr[arr.length - 1];
+                                                arr.pop();
+                                                console.log('New array values are...');
+                                                console.log(arr);
+                                            }
+                                        }
+                                        console.log('Finding minimum index value...');
+                                        const minValue = Math.min.apply(null, arr);
+                                        console.log(minValue);
+                                        console.log('Removing nonsense input from array...');
+                                        search === null || search === void 0 ? void 0 : search.pop();
+                                        console.log('Adding new time choice to array...');
+                                        const newTime = defaultTime[minValue];
+                                        search === null || search === void 0 ? void 0 : search.push(newTime);
+                                        console.log('Final array values are:');
+                                        console.log(search);
+                                        console.log('Continuing!');
+                                    }
                                     const newTimer = parseInt(search[0]);
+                                    if (!nolength && isNaN(newTimer)) {
+                                        console.log('caught at input');
+                                        throw 'Invalid input';
+                                    }
                                     if (newTimer > 20160 && search[1] === 'm' ||
                                         newTimer > 336 && search[1] === 'h' ||
                                         newTimer > 14 && search[1] === 'd') {
+                                        console.log('caught at time');
                                         throw "toolong";
                                     }
                                     //hours
                                     if (search[1] === 'h') {
+                                        console.log('set to hours');
                                         const countDown = newTimer * 3600000;
                                         const punishtime = unixTimestamp + countDown / 1000;
                                         yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -263,7 +295,9 @@ exports.default = {
                                         return;
                                         //Minutes
                                     }
-                                    if (search[1] === 'm') {
+                                    if ((search[1] === 'm') || !nolength) {
+                                        console.log('set to minutes');
+                                        console.log(newTimer);
                                         const countDown = newTimer * 60000;
                                         const punishtime = unixTimestamp + countDown / 1000;
                                         yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
@@ -297,6 +331,14 @@ exports.default = {
                                             });
                                             return;
                                         }));
+                                        try {
+                                            punishedEmbed.setTitle('You were muted');
+                                            punishedEmbed.setDescription(`You were muted on the server.`);
+                                            yield (punished === null || punished === void 0 ? void 0 : punished.send(({ embeds: [punishedEmbed] })));
+                                        }
+                                        catch (err) {
+                                            console.log('Unable to DM user reason.');
+                                        }
                                     }
                                 }
                                 return;
@@ -337,27 +379,35 @@ exports.default = {
                         /////////////////////////////////////////////////////////////////////// ERROR CATCHING
                     }
                     catch (error) {
-                        if (error === `You can't ${punishment} this user!`) {
-                            msgInt.editReply({
-                                content: `You can't ${punishment} this user!`,
-                                components: []
-                            });
-                        }
-                        if (error === `already ${punishment}ed`) {
-                            yield msgInt.editReply({
-                                content: `${punished} is already muted.`,
-                                components: []
-                            });
-                        }
-                        if (error === 'toolong') {
-                            yield msgInt.editReply({
-                                content: 'Time must be less than 14 days. E.g. 3d, 1300m, 8h.',
-                                components: []
-                            });
+                        switch (error) {
+                            case `You can't ${punishment} this user!`:
+                                msgInt.editReply({
+                                    content: `You can't ${punishment} this user!`,
+                                    components: []
+                                });
+                                break;
+                            case `already ${punishment}ed`:
+                                yield msgInt.editReply({
+                                    content: `${punished} is already muted.`,
+                                    components: []
+                                });
+                                break;
+                            case 'toolong':
+                                yield msgInt.editReply({
+                                    content: 'Time must be less than 14 days. E.g. 3d, 1300m, 8h.',
+                                    components: []
+                                });
+                                break;
+                            case 'Invalid input':
+                                yield msgInt.editReply({
+                                    content: 'Time must be specified as <number><d , m , h> OR <number>(will default to minutes).',
+                                    components: []
+                                });
+                                break;
                         }
                     }
-                    //Cancel command if no
                     /////////////////////////////////////////////////////////////////////// END OF COLLECTOR STATEMENT  
+                    //Cancel command if no
                 }
                 else if (((_e = collection.first()) === null || _e === void 0 ? void 0 : _e.customId) === 'punish_no') {
                     msgInt.editReply({

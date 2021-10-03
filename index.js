@@ -23,11 +23,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = __importStar(require("discord.js"));
-const wokcommands_1 = __importDefault(require("wokcommands"));
-const path_1 = __importDefault(require("path"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const client = new discord_js_1.default.Client({
+const fs = require('fs');
+const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+const BOT = new discord_js_1.default.Client({
     intents: [
         discord_js_1.Intents.FLAGS.GUILDS,
         discord_js_1.Intents.FLAGS.GUILD_MESSAGES,
@@ -35,27 +35,13 @@ const client = new discord_js_1.default.Client({
         discord_js_1.Intents.FLAGS.GUILD_MEMBERS
     ]
 });
-client.on('ready', () => {
-    new wokcommands_1.default(client, {
-        commandsDir: path_1.default.join(__dirname, 'commands/'),
-        typeScript: true,
-        ignoreBots: true,
-        testServers: ['889924333387005992'],
-        mongoUri: process.env.MONGO_URI
-    });
-});
-// client.on('guildCreate', () => {
-//const muted = msgInt.guild?.roles.cache.find(role => role.name === "muted");
-// Create role if muted doesn't exist
-//   if(!muted){
-//       await msgInt.guild?.roles.create({
-//           name: 'muted',
-//           color: '#8E8E8E',
-//           hoist: false,
-//           permissions: ['VIEW_CHANNEL'],
-//           position: 20,
-//           reason: 'Muted role did not exist.'
-//       })
-//     }
-//   })
-client.login(process.env.TOKEN);
+for (const file of eventFiles) {
+    const event = require(`./events/${file}`);
+    if (event.once) {
+        BOT.once(event.name, (...args) => event.execute(...args));
+    }
+    else {
+        BOT.on(event.name, (...args) => event.execute(...args));
+    }
+}
+BOT.login(process.env.TOKEN);
