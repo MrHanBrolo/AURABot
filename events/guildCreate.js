@@ -6,7 +6,7 @@
              * 
              * 
              * 
-             *         UPDATES ROLE CACHE
+             *         ADD GUILD TO DB
              * 
              * 
              * 
@@ -19,26 +19,27 @@
              * 
              * 
              * 
-             *          CREATES MUTED ROLE ON JOIN 
+             *          CREATE MUTED ROLE
              * 
              * 
              * 
              * 
             */
 
-            const muted = client.guild?.roles.cache.find(role => role.name === "muted");
-            // Create role if muted doesn't exist
-            if(!muted){
-            client.guild?.roles.create({
-                name: 'muted',
-                color: '#8E8E8E',
-                hoist: false,
-                permissions: ['VIEW_CHANNEL'],
-                position: 20,
-                reason: 'Muted role did not exist.'
+            // Check if role already exists
+            const muted = client.guild?.roles.cache.find(role => role.name === "muted").then(() => {
+                if(!muted){
+                    console.log('Joined new guild, creating mute role...')
+                    client.guild?.roles.create({
+                        name: 'muted',
+                        color: '#8E8E8E',
+                        hoist: false,
+                        permissions: ['VIEW_CHANNEL'],
+                        position: 20,
+                        reason: 'Muted role did not exist.'
+                    })
+                    console.log('Done...')
+                }
             })
-
-        }
-
-    },
+    }
 };

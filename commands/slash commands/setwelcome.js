@@ -16,56 +16,46 @@ const discord_js_1 = __importDefault(require("discord.js"));
 const welcome_schema_1 = __importDefault(require("../../models/welcome-schema"));
 //module.exports = {}
 exports.default = {
-    category: 'Configuration',
-    description: 'Sets the welcome channel.',
-    permissions: ['ADMINISTRATOR'],
+    category: "Configuration",
+    description: "Sets the welcome channel.",
+    permissions: ["ADMINISTRATOR"],
     minArgs: 2,
-    expectedArgs: '<channel> <text>',
-    slash: 'both',
+    expectedArgs: "<channel> <text>",
+    slash: "both",
     testOnly: true,
     options: [
         {
-            name: 'channel',
-            description: 'The target channel.',
+            name: "channel",
+            description: "The target channel.",
             required: true,
-            type: discord_js_1.default.Constants.ApplicationCommandOptionTypes.CHANNEL
+            type: discord_js_1.default.Constants.ApplicationCommandOptionTypes.CHANNEL,
         },
         {
-            name: 'text',
-            description: 'The target channel.',
+            name: "text",
+            description: "The target channel.",
             required: true,
-            type: discord_js_1.default.Constants.ApplicationCommandOptionTypes.STRING
-        }
+            type: discord_js_1.default.Constants.ApplicationCommandOptionTypes.STRING,
+        },
     ],
     callback: ({ guild, message, interaction, args }) => __awaiter(void 0, void 0, void 0, function* () {
         if (!guild) {
-            return 'Please use this command within a server.';
+            return "Please use this command within a server.";
         }
-        const target = message ? message.mentions.channels.first() : interaction.options.getChannel('channel');
-        if (!target || target.type !== 'GUILD_TEXT') {
-            return 'Please tag a text channel.';
+        const target = message
+            ? message.mentions.channels.first()
+            : interaction.options.getChannel("channel");
+        if (!target || target.type !== "GUILD_TEXT") {
+            return "Please tag a text channel.";
         }
-        let text = interaction === null || interaction === void 0 ? void 0 : interaction.options.getString('text');
+        let text = interaction === null || interaction === void 0 ? void 0 : interaction.options.getString("text");
         if (message) {
             // !setwelcome
             //removes initial channel index for legacy
             args.shift();
             //joins rest of words into a sentence
-            text = args.join(' ');
+            text = args.join(" ");
         }
-        yield welcome_schema_1.default.findOneAndUpdate({
-            _id: guild.id
-        }, {
-            _id: guild.id,
-            text,
-            channelId: target.id
-        }, {
-            upsert: true,
-        }, (err) => {
-            if (err) {
-                console.log(err);
-            }
-        });
-        return 'Welcome channel set!';
-    })
+        yield welcome_schema_1.default.findOneAndUpdate({ _id: guild.id }, { _id: guild.id, text, channelId: target.id }, { upsert: true });
+        return "Welcome channel set!";
+    }),
 };
