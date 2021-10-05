@@ -180,10 +180,16 @@ exports.default = {
                                 throw `already ${punishment}ed`;
                             }
                             if (time) {
-                                /////////////// WRONG INPUT CHECKING
-                                const timed = time.toLowerCase();
-                                const search = timed.match(/(\d+|[^\d]+)/g);
-                                const defaultTime = search[1].split("");
+                                /////////////// WRONG INPUT CHECKING - DON'T TOUCH THIS SHIT
+                                const timed = time.toLowerCase(); //converts input
+                                const search = timed.match(/(\d+|[^\d]+)/g); // basically seperates num from chars e.g. ['20', 'asdaf'] when given 20asdaf
+                                let defaultTime;
+                                if (search[1] === undefined) {
+                                    defaultTime = search[0].split("");
+                                }
+                                else {
+                                    defaultTime = search[1].split("");
+                                }
                                 const letter = new Array("h", "d", "m");
                                 const nolength = letter.some((i) => defaultTime === null || defaultTime === void 0 ? void 0 : defaultTime.includes(i));
                                 if (nolength) {
@@ -202,6 +208,7 @@ exports.default = {
                                     const newTime = defaultTime[minValue];
                                     search === null || search === void 0 ? void 0 : search.push(newTime);
                                 }
+                                /////////////// WRONG INPUT CHECKING - END OF THAT SHIT
                                 const newTimer = parseInt(search[0]);
                                 if (!nolength && isNaN(newTimer)) {
                                     console.log("caught at input");
@@ -213,7 +220,7 @@ exports.default = {
                                     console.log("caught at time");
                                     throw "toolong";
                                 }
-                                //hours
+                                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Hours
                                 if (search[1] === "h") {
                                     console.log("set to hours");
                                     const countDown = newTimer * 3600000;
@@ -245,7 +252,7 @@ exports.default = {
                                             punished.roles.remove(muted.id);
                                             punishedEmbed.setTimestamp();
                                             try {
-                                                punishedEmbed.setTitle("You were unmuted");
+                                                punishedEmbed.setTitle("User was unmuted");
                                                 punishedEmbed.setDescription(`You are no longer muted on the server.`);
                                                 yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
                                                 sent = true;
@@ -270,8 +277,8 @@ exports.default = {
                                         return;
                                     }));
                                     return;
-                                    //Days
                                 }
+                                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Days
                                 if (search[1] === "d") {
                                     const countDown = newTimer * 86400000;
                                     const punishtime = unixTimestamp + countDown / 1000;
@@ -302,7 +309,7 @@ exports.default = {
                                             punished.roles.remove(muted.id);
                                             punishedEmbed.setTimestamp();
                                             try {
-                                                punishedEmbed.setTitle("You were unmuted");
+                                                punishedEmbed.setTitle("User was unmuted");
                                                 punishedEmbed.setDescription(`You are no longer muted on the server.`);
                                                 yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
                                                 sent = true;
@@ -357,11 +364,12 @@ exports.default = {
                                             punishedEmbed.setDescription(`${punished} was muted until <t:${punishtime}:f> because ${kicker} said so.`);
                                             channel.send({ embeds: [punishedEmbed] });
                                         }
-                                        setTimeout((muted) => __awaiter(void 0, void 0, void 0, function* () {
+                                        setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
+                                            console.log("timeout error");
                                             punished.roles.remove(muted.id);
                                             punishedEmbed.setTimestamp();
                                             try {
-                                                punishedEmbed.setTitle("You were unmuted");
+                                                punishedEmbed.setTitle("User was unmuted");
                                                 punishedEmbed.setDescription(`You are no longer muted on the server.`);
                                                 yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
                                             }
@@ -387,7 +395,7 @@ exports.default = {
                                 }
                             }
                             else if (!time) {
-                                console.log('made it here');
+                                console.log("made it here");
                                 try {
                                     punishedEmbed.setTitle("You have been muted");
                                     if (rsn) {
@@ -469,7 +477,7 @@ exports.default = {
                             components: [],
                         });
                         break;
-                    case `already ${punishment}`:
+                    case `already ${punishment}ed`:
                         yield msgInt.editReply({
                             content: `${punished} is already ${punishment}ed.`,
                             components: [],

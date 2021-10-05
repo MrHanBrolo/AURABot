@@ -11,91 +11,60 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
 exports.default = {
-    category: 'Testing',
-    description: 'Testing',
+    category: "Moderation",
+    description: "Unbans / Mutes a user.",
     slash: true,
     testOnly: true,
     options: [
         {
-            name: 'ban',
-            description: 'Permanently ban a user from the server.',
+            name: "ban",
+            description: "Unban a user from the server.",
             type: 1,
             options: [
                 {
-                    name: 'user',
-                    description: 'The user you want to ban.',
+                    name: "user",
+                    description: "The user you want to unban.",
                     type: 6,
                     required: true,
                 },
                 {
-                    name: 'reason',
-                    description: 'Why you want to ban them.',
+                    name: "reason",
+                    description: "Why you want to ban them.",
                     type: 3,
-                    required: true,
-                }
-            ]
+                    required: false,
+                },
+            ],
         },
         {
-            name: 'kick',
-            description: 'Kick a user from the server.',
+            name: "mute",
+            description: "Unmute a user from the server.",
             type: 1,
             options: [
                 {
-                    name: 'user',
-                    description: 'The user you want to ban.',
-                    type: 6,
-                    required: false,
-                },
-                {
-                    name: 'reason',
-                    description: 'Why you want to ban them.',
-                    type: 3,
-                    required: false,
-                }
-            ]
-        },
-        {
-            name: 'mute',
-            description: 'Assigns a muted role to the user.',
-            type: 1,
-            options: [
-                {
-                    name: 'user',
-                    description: 'The user you want to mute.',
+                    name: "user",
+                    description: "The user you want to unmute.",
                     type: 6,
                     required: true,
                 },
-                {
-                    name: 'time',
-                    description: 'How long you want to mute the user for.',
-                    type: 3,
-                    required: false,
-                },
-                {
-                    name: 'reason',
-                    description: 'Why you want to ban them (optionl, but recommended if its not an emergency).',
-                    type: 3,
-                    required: false,
-                }
-            ]
-        }
+            ],
+        },
     ],
     callback: ({ interaction: msgInt, channel }) => __awaiter(void 0, void 0, void 0, function* () {
         const timeElapsed = Date.now();
         const unixTimestamp = Math.floor(new Date(timeElapsed).getTime() / 1000);
         const punishRow = new discord_js_1.MessageActionRow()
             .addComponents(new discord_js_1.MessageButton()
-            .setCustomId('punish_yes')
-            .setLabel('Confirm')
-            .setStyle('SUCCESS'))
+            .setCustomId("punish_yes")
+            .setLabel("Confirm")
+            .setStyle("SUCCESS"))
             .addComponents(new discord_js_1.MessageButton()
-            .setCustomId('punish_no')
-            .setLabel('Cancel')
-            .setStyle('DANGER'));
+            .setCustomId("punish_no")
+            .setLabel("Cancel")
+            .setStyle("DANGER"));
         yield msgInt.reply({
-            content: 'Are you sure?',
+            content: "Are you sure?",
             components: [punishRow],
-            ephemeral: true
+            ephemeral: true,
         });
         const filter = (btnInt) => {
             return msgInt.user.id === btnInt.user.id;
@@ -103,143 +72,81 @@ exports.default = {
         const collector = channel.createMessageComponentCollector({
             filter,
             max: 1,
-            time: 1000 * 15
+            time: 1000 * 15,
         });
-        collector.on('end', (collection) => __awaiter(void 0, void 0, void 0, function* () {
+        collector.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
             var _a, _b, _c, _d;
+            const muted = (_a = msgInt.guild) === null || _a === void 0 ? void 0 : _a.roles.cache.find((role) => role.name === "muted");
             try {
-                if (((_a = collection.first()) === null || _a === void 0 ? void 0 : _a.customId) === 'punish_yes') {
+                if (((_b = collection.first()) === null || _b === void 0 ? void 0 : _b.customId) === "punish_yes") {
                     // Member checks
-                    const punished = msgInt.options.getMember('user', true);
+                    const punished = msgInt.options.getMember("user", true);
                     const kicker = msgInt.user.tag;
                     // reason checks
-                    const rsn = msgInt.options.getString('reason', false);
+                    const rsn = msgInt.options.getString("reason", false);
                     // command checks
-                    const punishment = msgInt.options.getSubcommand();
-                    const time = msgInt.options.getString('time');
-                    const punishedEmbed = new discord_js_1.MessageEmbed()
-                        .setColor('#76b900')
+                    const undo = msgInt.options.getSubcommand();
+                    const unpunishedEmbed = new discord_js_1.MessageEmbed()
+                        .setColor("#76b900")
                         .setAuthor(`Action performed by: ${kicker}`)
                         .setTimestamp()
-                        .setFooter('Remember to behave!');
-                    //Checks if specified user is able to be punished and exists in the server
-                    try {
-                        if (!punished.kickable || !punished.bannable) {
-                            throw `You can't ${punishment} this user!`;
-                        }
-                        switch (punishment) {
-                            /////////////////////////////////////////////////////////////////////// KICK
-                            /////////////////////////////////////////////////////////////////////// KICK
-                            /////////////////////////////////////////////////////////////////////// KICK
-                            case ('mute'):
-                                // Check if user has role
-                                if (!punished.roles.cache.some(role => role.name === 'muted')) {
-                                    throw `already unmuted`;
-                                }
-                                //Tries to DM user and sends reason if provided - continues if not
+                        .setFooter("Remember to behave!");
+                    switch (undo) {
+                        case "mute":
+                            // Check if user has role             
+                            const muted = (_c = msgInt.guild) === null || _c === void 0 ? void 0 : _c.roles.cache.find((role) => role.name === "muted");
+                            if (!punished.roles.cache.some((role) => role.name === "muted")) {
+                                throw `User is not muted.`;
+                            }
+                            yield punished.roles.remove(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
+                                unpunishedEmbed.setTitle("User was unmuted");
                                 try {
-                                    yield (punished === null || punished === void 0 ? void 0 : punished.send('You have been unmuted from the test server.'));
+                                    unpunishedEmbed.setDescription("You are no longer muted on the server");
+                                    yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [unpunishedEmbed] }));
                                 }
-                                catch (err) {
-                                    console.log('Unable to DM user reason.');
-                                }
-                                //Waits for member kick then sends embed giving details
-                                yield ((_b = msgInt.guild) === null || _b === void 0 ? void 0 : _b.members.kick(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
-                                    punishedEmbed.setTitle('User was kicked');
-                                    punishedEmbed.setDescription(`${punished} was kicked from the server`);
-                                    //if a reason is included, else none
-                                    if (rsn) {
-                                        punishedEmbed.addField('Reason for kicking', `${rsn}`);
-                                        channel.send({ embeds: [punishedEmbed] });
-                                    }
-                                    else {
-                                        punishedEmbed.addField('Reason for kicking', 'No reason given');
-                                        channel.send({ embeds: [punishedEmbed] });
-                                    }
-                                    yield msgInt.editReply({
-                                        content: 'Completed.',
-                                        components: []
-                                    });
-                                    return;
-                                })));
+                                catch (err) { }
+                                unpunishedEmbed.setDescription(`${punished} was unmuted at <t:${unixTimestamp}:f> and is no longer muted on the server`);
+                                channel.send({ embeds: [unpunishedEmbed] });
+                                yield msgInt.editReply({
+                                    content: `Unmuted ${punished}`,
+                                    components: [],
+                                });
                                 return;
-                            /////////////////////////////////////////////////////////////////////// BAN
-                            /////////////////////////////////////////////////////////////////////// BAN
-                            /////////////////////////////////////////////////////////////////////// BAN
-                            case ('ban'):
-                                //Waits for member kick then sends embed giving details
-                                yield ((_c = msgInt.guild) === null || _c === void 0 ? void 0 : _c.members.ban(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
-                                    punishedEmbed.setTitle('User was banned');
-                                    punishedEmbed.setDescription(`${punished} was banned from the server`);
-                                    //if a reason is included, else none
-                                    if (rsn) {
-                                        punishedEmbed.addField('Reason for Ban', `${rsn}`);
-                                        channel.send({ embeds: [punishedEmbed] });
-                                    }
-                                    else {
-                                        punishedEmbed.addField('Reason for Ban', 'No reason given');
-                                        channel.send({ embeds: [punishedEmbed] });
-                                    }
-                                    yield (punished === null || punished === void 0 ? void 0 : punished.send(`You have been banned from the test server because: ${rsn}`).catch());
-                                    yield msgInt.editReply({
-                                        content: 'Completed.',
-                                        components: []
-                                    });
-                                    return;
-                                })));
-                                return;
-                        }
-                        /////////////////////////////////////////////////////////////////////// END OF SWITCH STATEMENT
-                        /////////////////////////////////////////////////////////////////////// ERROR CATCHING
-                        /////////////////////////////////////////////////////////////////////// ERROR CATCHING
-                        /////////////////////////////////////////////////////////////////////// ERROR CATCHING
+                            }));
+                            return;
+                        // case "ban":
                     }
-                    catch (error) {
-                        switch (error) {
-                            case `You can't ${punishment} this user!`:
-                                msgInt.editReply({
-                                    content: `You can't ${punishment} this user!`,
-                                    components: []
-                                });
-                                break;
-                            case `already ${punishment}ed`:
-                                yield msgInt.editReply({
-                                    content: `${punished} is already muted.`,
-                                    components: []
-                                });
-                                break;
-                            case 'toolong':
-                                yield msgInt.editReply({
-                                    content: 'Time must be less than 14 days. E.g. 3d, 1300m, 8h.',
-                                    components: []
-                                });
-                                break;
-                            case 'Invalid input':
-                                yield msgInt.editReply({
-                                    content: 'Time must be specified as <number><d , m , h> OR <number>(will default to minutes).',
-                                    components: []
-                                });
-                                break;
-                        }
-                    }
-                    /////////////////////////////////////////////////////////////////////// END OF COLLECTOR STATEMENT  
-                    //Cancel command if no
                 }
-                else if (((_d = collection.first()) === null || _d === void 0 ? void 0 : _d.customId) === 'punish_no') {
+                else if (((_d = collection.first()) === null || _d === void 0 ? void 0 : _d.customId) === "punish_no") {
                     msgInt.editReply({
-                        content: 'Action cancelled',
-                        components: []
+                        content: "Action cancelled",
+                        components: [],
                     });
                 }
             }
             catch (error) {
-                if (error instanceof TypeError && error.name === "TypeError [COMMAND_INTERACTION_OPTION_EMPTY]") {
+                switch (error) {
+                    case "User is not muted.":
+                        msgInt.editReply({
+                            content: 'User is not muted!',
+                            components: [],
+                        });
+                        break;
+                    case "User is not banned":
+                        yield msgInt.editReply({
+                            content: "User is not currently banned from the guild!",
+                            components: [],
+                        });
+                        break;
+                }
+                if (error instanceof TypeError &&
+                    error.name === "TypeError [COMMAND_INTERACTION_OPTION_EMPTY]") {
                     msgInt.editReply({
-                        content: 'User is not in guild.',
-                        components: []
+                        content: "User is not in guild.",
+                        components: [],
                     });
                 }
             }
         }));
-    })
+    }),
 };

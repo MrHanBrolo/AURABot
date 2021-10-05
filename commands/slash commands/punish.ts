@@ -202,10 +202,16 @@ import {
                 }
   
                 if (time) {
-                  /////////////// WRONG INPUT CHECKING
-                  const timed = time.toLowerCase();
-                  const search = timed.match(/(\d+|[^\d]+)/g);
-                  const defaultTime = search![1].split("");
+                  /////////////// WRONG INPUT CHECKING - DON'T TOUCH THIS SHIT
+                  const timed = time.toLowerCase(); //converts input
+                  const search = timed.match(/(\d+|[^\d]+)/g); // basically seperates num from chars e.g. ['20', 'asdaf'] when given 20asdaf
+                  let defaultTime;
+                  if (search![1] === undefined) {
+                    defaultTime = search![0].split("");
+                  } else {
+                    defaultTime = search![1].split("");
+                  }
+  
                   const letter = new Array("h", "d", "m");
                   const nolength = letter.some((i) => defaultTime?.includes(i));
   
@@ -226,6 +232,7 @@ import {
                     const newTime = defaultTime[minValue];
                     search?.push(newTime);
                   }
+                  /////////////// WRONG INPUT CHECKING - END OF THAT SHIT
                   const newTimer = parseInt(search![0]);
   
                   if (!nolength && isNaN(newTimer)) {
@@ -242,7 +249,7 @@ import {
                     throw "toolong";
                   }
   
-                  //hours
+                  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Hours
                   if (search![1] === "h") {
                     console.log("set to hours");
                     const countDown = newTimer * 3600000;
@@ -281,7 +288,7 @@ import {
                         punished.roles.remove(muted!.id);
                         punishedEmbed.setTimestamp();
                         try {
-                          punishedEmbed.setTitle("You were unmuted");
+                          punishedEmbed.setTitle("User was unmuted");
                           punishedEmbed.setDescription(
                             `You are no longer muted on the server.`
                           );
@@ -311,9 +318,8 @@ import {
                       return;
                     });
                     return;
-  
-                    //Days
                   }
+                  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Days
                   if (search![1] === "d") {
                     const countDown = newTimer * 86400000;
                     const punishtime = unixTimestamp + countDown / 1000;
@@ -352,7 +358,7 @@ import {
                         punished.roles.remove(muted!.id);
                         punishedEmbed.setTimestamp();
                         try {
-                          punishedEmbed.setTitle("You were unmuted");
+                          punishedEmbed.setTitle("User was unmuted");
                           punishedEmbed.setDescription(
                             `You are no longer muted on the server.`
                           );
@@ -421,12 +427,13 @@ import {
                         channel.send({ embeds: [punishedEmbed] });
                       }
   
-                      setTimeout(async (muted) => {
+                      setTimeout(async () => {
+                        console.log("timeout error");
                         punished.roles.remove(muted!.id);
                         punishedEmbed.setTimestamp();
   
                         try {
-                          punishedEmbed.setTitle("You were unmuted");
+                          punishedEmbed.setTitle("User was unmuted");
                           punishedEmbed.setDescription(
                             `You are no longer muted on the server.`
                           );
@@ -454,9 +461,8 @@ import {
                       return;
                     });
                   }
-               }  
-                else if (!time){           
-                console.log('made it here')
+                } else if (!time) {
+                  console.log("made it here");
                   try {
                     punishedEmbed.setTitle("You have been muted");
                     if (rsn) {
@@ -551,7 +557,7 @@ import {
               });
               break;
   
-            case `already ${punishment}`:
+            case `already ${punishment}ed`:
               await msgInt.editReply({
                 content: `${punished} is already ${punishment}ed.`,
                 components: [],
@@ -586,4 +592,5 @@ import {
         }
       });
     },
-  } as ICommand;  
+  } as ICommand;
+  
