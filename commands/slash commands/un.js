@@ -73,8 +73,6 @@ exports.default = {
         try {
             switch (undo) {
                 case "mute":
-                    console.log("verified case");
-                    /////////// GET LIST OF USERS WHO HAVE MUTED ROLES
                     const list = yield ((_b = msgInt.guild) === null || _b === void 0 ? void 0 : _b.members.fetch());
                     list === null || list === void 0 ? void 0 : list.forEach((users) => {
                         if (users.roles.cache.some((role) => role.name === "muted")) {
@@ -96,13 +94,11 @@ exports.default = {
                         });
                         return;
                     }
-                    console.log('Got past checking users');
                     mutedMenu.maxValues = mutedUser.length;
                     for (let i = 0; i < mutedUser.length; i++) {
                         mutedMenu.addOptions([mutedUser[i]]);
                     }
                     userRow.addComponents(mutedMenu);
-                    //////////// INITIATE MENU
                     const menuCollector = channel.createMessageComponentCollector({
                         componentType: "SELECT_MENU",
                         filter,
@@ -115,20 +111,25 @@ exports.default = {
                         ephemeral: true,
                         fetchReply: true,
                     });
-                    /////////// START COLLECTING RESPONSES FROM SELECT MENU
                     menuCollector.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
                         var _e, _f;
                         if (((_e = collection.first()) === null || _e === void 0 ? void 0 : _e.customId) === "mutedusers") {
                             let myValues = collection.first();
                             if (myValues === null || myValues === void 0 ? void 0 : myValues.isSelectMenu()) {
-                                console.log(myValues.values);
                                 if (myValues.values.length === undefined) {
                                     throw "No users are muted in this server!";
                                 }
                                 for (let i = 0; i < myValues.values.length; i++) {
                                     let users = yield ((_f = msgInt.guild) === null || _f === void 0 ? void 0 : _f.members.fetch(myValues.values[i]));
                                     users === null || users === void 0 ? void 0 : users.roles.remove(muted.id);
+                                    let user = users === null || users === void 0 ? void 0 : users.displayName;
+                                    unpunishedEmbed.addFields({
+                                        name: `User was unmuted`,
+                                        value: `${user} is no longer muted on the server`
+                                    });
                                 }
+                                unpunishedEmbed.setDescription(`Action performed at <t:${unixTimestamp}:f>`);
+                                channel.send({ embeds: [unpunishedEmbed] });
                             }
                         }
                         yield msgInt.editReply({
@@ -136,19 +137,10 @@ exports.default = {
                             components: []
                         });
                     }));
-                    //   } else if (collection.first()?.customId === "punish_no") {
-                    //     msgInt.editReply({
-                    //       content: "Action cancelled",
-                    //       components: [],
-                    //     });
-                    //   }
-                    // });
                     return;
                 case "ban":
                     const userId = yield msgInt.options.getString("id", true);
-                    console.log(userId);
                     const banned = yield ((_c = msgInt.guild) === null || _c === void 0 ? void 0 : _c.bans.fetch());
-                    console.log(banned === null || banned === void 0 ? void 0 : banned.has(userId));
                     if (!(banned === null || banned === void 0 ? void 0 : banned.has(userId))) {
                         console.log("caught");
                         throw "User is not banned.";

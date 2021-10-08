@@ -188,7 +188,7 @@ import {
   
                 //Check user isn't muted already
                 if (punished.roles.cache.some((role) => role.name === "muted")) {
-                  throw `already ${punishment}ed`;
+                  throw `already punished`;
                 }
   
                 if (time) {
@@ -226,7 +226,6 @@ import {
                   const newTimer = parseInt(search![0]);
   
                   if (!nolength && isNaN(newTimer)) {
-                    console.log("caught at input");
                     throw "Invalid input";
                   }
   
@@ -235,7 +234,6 @@ import {
                     (newTimer > 336 && search![1] === "h") ||
                     (newTimer > 14 && search![1] === "d")
                   ) {
-                    console.log("caught at time");
                     throw "toolong";
                   }
   
@@ -543,12 +541,26 @@ import {
               });
               break;
   
-            case `already ${punishment}ed`:
+            case `already muted`:
               await msgInt.editReply({
-                content: `${punished} is already ${punishment}ed.`,
+                content: `${punished} is already muted.`,
                 components: [],
               });
               break;
+
+              case `already banned`:
+              await msgInt.editReply({
+                content: `${punished} is already banned.`,
+                components: [],
+              });
+              break;
+
+              case `already kicked`:
+                await msgInt.editReply({
+                  content: `${punished} is not in the server.`,
+                  components: [],
+                });
+                break;
   
             case "toolong":
               await msgInt.editReply({

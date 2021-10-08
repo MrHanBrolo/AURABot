@@ -85,8 +85,6 @@ export default {
     try {
       switch (undo) {
         case "mute":
-          console.log("verified case");
-          /////////// GET LIST OF USERS WHO HAVE MUTED ROLES
           const list = await msgInt.guild?.members.fetch();
           list?.forEach((users) => {
             if (users.roles.cache.some((role) => role.name === "muted")) {
@@ -109,16 +107,12 @@ export default {
             });
             return
           }
-
-          console.log('Got past checking users')
           mutedMenu.maxValues = mutedUser.length;
 
           for (let i = 0; i < mutedUser.length; i++) {
             mutedMenu.addOptions([mutedUser[i]]);
           }
           userRow.addComponents(mutedMenu);
-
-          //////////// INITIATE MENU
           const menuCollector = channel.createMessageComponentCollector({
             componentType: "SELECT_MENU",
             filter,
@@ -132,16 +126,11 @@ export default {
             ephemeral: true,
             fetchReply: true,
           });
-          /////////// START COLLECTING RESPONSES FROM SELECT MENU
 
           menuCollector.on("end", async (collection) => {
             if (collection.first()?.customId === "mutedusers") {
               let myValues = collection.first();
-
-
                   if (myValues?.isSelectMenu()) {
-                    console.log(myValues.values);
-
                     if(myValues.values.length === undefined){
                       throw "No users are muted in this server!"
                     }
@@ -149,7 +138,17 @@ export default {
                     for(let i=0; i < myValues.values.length; i++){
                       let users = await msgInt.guild?.members.fetch(myValues.values[i])
                       users?.roles.remove(muted!.id)
+                      let user = users?.displayName
+                      unpunishedEmbed.addFields(
+                        {
+                            name: `User was unmuted`,
+                            value: `${user} is no longer muted on the server`
+                        })
                     }
+                    unpunishedEmbed.setDescription(
+                      `Action performed at <t:${unixTimestamp}:f>`
+                    );
+                    channel.send({ embeds: [unpunishedEmbed] });
                   }
                 }
                 await msgInt.editReply({
@@ -157,24 +156,11 @@ export default {
                   components:[]
                 });
               });
-            
-
-          //   } else if (collection.first()?.customId === "punish_no") {
-          //     msgInt.editReply({
-          //       content: "Action cancelled",
-          //       components: [],
-          //     });
-          //   }
-          // });
           return;
 
         case "ban":
           const userId = await msgInt.options.getString("id", true);
-
-          console.log(userId);
           const banned = await msgInt.guild?.bans.fetch();
-
-          console.log(banned?.has(userId));
 
           if (!banned?.has(userId)) {
             console.log("caught");

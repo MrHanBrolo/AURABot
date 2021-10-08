@@ -171,7 +171,7 @@ exports.default = {
                             const muted = (_c = msgInt.guild) === null || _c === void 0 ? void 0 : _c.roles.cache.find((role) => role.name === "muted");
                             //Check user isn't muted already
                             if (punished.roles.cache.some((role) => role.name === "muted")) {
-                                throw `already ${punishment}ed`;
+                                throw `already punished`;
                             }
                             if (time) {
                                 /////////////// WRONG INPUT CHECKING - DON'T TOUCH THIS SHIT
@@ -205,13 +205,11 @@ exports.default = {
                                 /////////////// WRONG INPUT CHECKING - END OF THAT SHIT
                                 const newTimer = parseInt(search[0]);
                                 if (!nolength && isNaN(newTimer)) {
-                                    console.log("caught at input");
                                     throw "Invalid input";
                                 }
                                 if ((newTimer > 20160 && search[1] === "m") ||
                                     (newTimer > 336 && search[1] === "h") ||
                                     (newTimer > 14 && search[1] === "d")) {
-                                    console.log("caught at time");
                                     throw "toolong";
                                 }
                                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Hours
@@ -468,9 +466,21 @@ exports.default = {
                             components: [],
                         });
                         break;
-                    case `already ${punishment}ed`:
+                    case `already muted`:
                         yield msgInt.editReply({
-                            content: `${punished} is already ${punishment}ed.`,
+                            content: `${punished} is already muted.`,
+                            components: [],
+                        });
+                        break;
+                    case `already banned`:
+                        yield msgInt.editReply({
+                            content: `${punished} is already banned.`,
+                            components: [],
+                        });
+                        break;
+                    case `already kicked`:
+                        yield msgInt.editReply({
+                            content: `${punished} is not in the server.`,
                             components: [],
                         });
                         break;
