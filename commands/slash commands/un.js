@@ -22,16 +22,10 @@ exports.default = {
             type: 1,
             options: [
                 {
-                    name: "user",
-                    description: "The user you want to unban.",
-                    type: 6,
-                    required: true,
-                },
-                {
-                    name: "reason",
-                    description: "Why you want to ban them.",
+                    name: "id",
+                    description: "The user you want to unmute.",
                     type: 3,
-                    required: false,
+                    required: true,
                 },
             ],
         },
@@ -39,19 +33,20 @@ exports.default = {
             name: "mute",
             description: "Unmute a user from the server.",
             type: 1,
-            options: [
-                {
-                    name: "user",
-                    description: "The user you want to unmute.",
-                    type: 6,
-                    required: true,
-                },
-            ],
         },
     ],
     callback: ({ interaction: msgInt, channel }) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b, _c, _d;
+        const muted = (_a = msgInt.guild) === null || _a === void 0 ? void 0 : _a.roles.cache.find((role) => role.name === "muted");
+        const undo = msgInt.options.getSubcommand();
         const timeElapsed = Date.now();
         const unixTimestamp = Math.floor(new Date(timeElapsed).getTime() / 1000);
+        const kicker = msgInt.user.tag;
+        const mutedUser = new Array();
+        const mutedMenu = new discord_js_1.MessageSelectMenu()
+            .setCustomId("mutedusers")
+            .setPlaceholder("None Selected");
+        const userRow = new discord_js_1.MessageActionRow();
         const punishRow = new discord_js_1.MessageActionRow()
             .addComponents(new discord_js_1.MessageButton()
             .setCustomId("punish_yes")
@@ -61,11 +56,6 @@ exports.default = {
             .setCustomId("punish_no")
             .setLabel("Cancel")
             .setStyle("DANGER"));
-        yield msgInt.reply({
-            content: "Are you sure?",
-            components: [punishRow],
-            ephemeral: true,
-        });
         const filter = (btnInt) => {
             return msgInt.user.id === btnInt.user.id;
         };
@@ -74,79 +64,136 @@ exports.default = {
             max: 1,
             time: 1000 * 15,
         });
-        collector.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
-            var _a, _b, _c, _d;
-            const muted = (_a = msgInt.guild) === null || _a === void 0 ? void 0 : _a.roles.cache.find((role) => role.name === "muted");
-            try {
-                if (((_b = collection.first()) === null || _b === void 0 ? void 0 : _b.customId) === "punish_yes") {
-                    // Member checks
-                    const punished = msgInt.options.getMember("user", true);
-                    const kicker = msgInt.user.tag;
-                    // reason checks
-                    const rsn = msgInt.options.getString("reason", false);
-                    // command checks
-                    const undo = msgInt.options.getSubcommand();
-                    const unpunishedEmbed = new discord_js_1.MessageEmbed()
-                        .setColor("#76b900")
-                        .setAuthor(`Action performed by: ${kicker}`)
-                        .setTimestamp()
-                        .setFooter("Remember to behave!");
-                    switch (undo) {
-                        case "mute":
-                            // Check if user has role             
-                            const muted = (_c = msgInt.guild) === null || _c === void 0 ? void 0 : _c.roles.cache.find((role) => role.name === "muted");
-                            if (!punished.roles.cache.some((role) => role.name === "muted")) {
-                                throw `User is not muted.`;
-                            }
-                            yield punished.roles.remove(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
-                                unpunishedEmbed.setTitle("User was unmuted");
-                                try {
-                                    unpunishedEmbed.setDescription("You are no longer muted on the server");
-                                    yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [unpunishedEmbed] }));
-                                }
-                                catch (err) { }
-                                unpunishedEmbed.setDescription(`${punished} was unmuted at <t:${unixTimestamp}:f> and is no longer muted on the server`);
-                                channel.send({ embeds: [unpunishedEmbed] });
-                                yield msgInt.editReply({
-                                    content: `Unmuted ${punished}`,
-                                    components: [],
-                                });
-                                return;
-                            }));
-                            return;
-                        // case "ban":
+        const unpunishedEmbed = new discord_js_1.MessageEmbed()
+            .setColor("#76b900")
+            .setAuthor(`Action performed by: ${kicker}`)
+            .setTimestamp()
+            .setFooter("Remember to behave!");
+        console.log("verified input");
+        try {
+            switch (undo) {
+                case "mute":
+                    console.log("verified case");
+                    /////////// GET LIST OF USERS WHO HAVE MUTED ROLES
+                    const list = yield ((_b = msgInt.guild) === null || _b === void 0 ? void 0 : _b.members.fetch());
+                    list === null || list === void 0 ? void 0 : list.forEach((users) => {
+                        if (users.roles.cache.some((role) => role.name === "muted")) {
+                            mutedUser.push({
+                                label: `${users.displayName}`,
+                                value: `${users.id}`,
+                                emoji: {
+                                    id: null,
+                                    name: "🔇",
+                                },
+                            });
+                        }
+                    });
+                    if (mutedUser[0] === undefined) {
+                        yield msgInt.reply({
+                            content: "No one is muted on the server!",
+                            components: [],
+                            ephemeral: true,
+                        });
+                        return;
                     }
-                }
-                else if (((_d = collection.first()) === null || _d === void 0 ? void 0 : _d.customId) === "punish_no") {
-                    msgInt.editReply({
-                        content: "Action cancelled",
-                        components: [],
+                    console.log('Got past checking users');
+                    mutedMenu.maxValues = mutedUser.length;
+                    for (let i = 0; i < mutedUser.length; i++) {
+                        mutedMenu.addOptions([mutedUser[i]]);
+                    }
+                    userRow.addComponents(mutedMenu);
+                    //////////// INITIATE MENU
+                    const menuCollector = channel.createMessageComponentCollector({
+                        componentType: "SELECT_MENU",
+                        filter,
+                        max: 1,
+                        time: 1000 * 30,
                     });
-                }
-            }
-            catch (error) {
-                switch (error) {
-                    case "User is not muted.":
-                        msgInt.editReply({
-                            content: 'User is not muted!',
-                            components: [],
-                        });
-                        break;
-                    case "User is not banned":
+                    yield msgInt.reply({
+                        content: "Choose who to unmute",
+                        components: [userRow],
+                        ephemeral: true,
+                        fetchReply: true,
+                    });
+                    /////////// START COLLECTING RESPONSES FROM SELECT MENU
+                    menuCollector.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
+                        var _e, _f;
+                        if (((_e = collection.first()) === null || _e === void 0 ? void 0 : _e.customId) === "mutedusers") {
+                            let myValues = collection.first();
+                            if (myValues === null || myValues === void 0 ? void 0 : myValues.isSelectMenu()) {
+                                console.log(myValues.values);
+                                if (myValues.values.length === undefined) {
+                                    throw "No users are muted in this server!";
+                                }
+                                for (let i = 0; i < myValues.values.length; i++) {
+                                    let users = yield ((_f = msgInt.guild) === null || _f === void 0 ? void 0 : _f.members.fetch(myValues.values[i]));
+                                    users === null || users === void 0 ? void 0 : users.roles.remove(muted.id);
+                                }
+                            }
+                        }
                         yield msgInt.editReply({
-                            content: "User is not currently banned from the guild!",
-                            components: [],
+                            content: "Unmuted users.",
+                            components: []
                         });
-                        break;
-                }
-                if (error instanceof TypeError &&
-                    error.name === "TypeError [COMMAND_INTERACTION_OPTION_EMPTY]") {
+                    }));
+                    //   } else if (collection.first()?.customId === "punish_no") {
+                    //     msgInt.editReply({
+                    //       content: "Action cancelled",
+                    //       components: [],
+                    //     });
+                    //   }
+                    // });
+                    return;
+                case "ban":
+                    const userId = yield msgInt.options.getString("id", true);
+                    console.log(userId);
+                    const banned = yield ((_c = msgInt.guild) === null || _c === void 0 ? void 0 : _c.bans.fetch());
+                    console.log(banned === null || banned === void 0 ? void 0 : banned.has(userId));
+                    if (!(banned === null || banned === void 0 ? void 0 : banned.has(userId))) {
+                        console.log("caught");
+                        throw "User is not banned.";
+                    }
+                    else {
+                        yield ((_d = msgInt.guild) === null || _d === void 0 ? void 0 : _d.members.unban(userId).then((user) => __awaiter(void 0, void 0, void 0, function* () {
+                            unpunishedEmbed.setDescription(`${user.tag} was unbanned at <t:${unixTimestamp}:f> and is no longer banned on the server`);
+                            channel.send({ embeds: [unpunishedEmbed] });
+                            yield msgInt.editReply({
+                                content: `Unbanned user.`,
+                                components: [],
+                            });
+                            return;
+                        })));
+                    }
+            }
+        }
+        catch (error) {
+            switch (error) {
+                case "User is not muted.":
                     msgInt.editReply({
-                        content: "User is not in guild.",
+                        content: "User is not muted!",
                         components: [],
                     });
-                }
+                    break;
+                case "No users are muted in this server!":
+                    msgInt.editReply({
+                        content: "No users are muted in this server!",
+                        components: [],
+                    });
+                    break;
+                case "User is not banned.":
+                    yield msgInt.editReply({
+                        content: "User is not currently banned from the guild!",
+                        components: [],
+                    });
+                    break;
             }
-        }));
+            if (error instanceof TypeError &&
+                error.name === "TypeError [COMMAND_INTERACTION_OPTION_EMPTY]") {
+                msgInt.editReply({
+                    content: "User is not in guild.",
+                    components: [],
+                });
+            }
+        }
     }),
 };

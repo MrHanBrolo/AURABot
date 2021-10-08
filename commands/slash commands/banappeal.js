@@ -73,6 +73,7 @@ exports.default = {
         const filter = (btnInt) => {
             return msgInt.user.id === btnInt.user.id;
         };
+        console.log(filter);
         const collector = channel.createMessageComponentCollector({
             filter,
             max: 1,

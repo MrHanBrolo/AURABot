@@ -1,5 +1,5 @@
 import {
-    ButtonInteraction,
+    MessageComponentInteraction,
     GuildMember,
     MessageActionRow,
     MessageButton,
@@ -109,7 +109,7 @@ import {
         ephemeral: true,
       });
   
-      const filter = (btnInt: ButtonInteraction) => {
+      const filter = (btnInt: MessageComponentInteraction) => {
         return msgInt.user.id === btnInt.user.id;
       };
   
@@ -138,8 +138,7 @@ import {
             switch (punishment) {
               /////////////////////////////////////////////////////////////////////// KICK
               /////////////////////////////////////////////////////////////////////// KICK
-              /////////////////////////////////////////////////////////////////////// KICK
-  
+              /////////////////////////////////////////////////////////////////////// KICK 
               case "kick":
                 //Tries to DM user and sends reason if provided - continues if not
                 try {
@@ -162,16 +161,7 @@ import {
                   punishedEmbed.setDescription(
                     `${punished} was kicked from the server`
                   );
-                  //if a reason is included, else none
-                  if (rsn) {
-                    channel.send({ embeds: [punishedEmbed] });
-                  } else {
-                    punishedEmbed.addField(
-                      "Reason for kicking",
-                      "No reason given"
-                    );
-                    channel.send({ embeds: [punishedEmbed] });
-                  }
+                  channel.send({ embeds: [punishedEmbed] });
                   if (sent) {
                     await msgInt.editReply({
                       content: "Completed.",
@@ -183,6 +173,7 @@ import {
                       content: "Completed but unable to DM user.",
                       components: [],
                     });
+                    return
                   }
                 });
                 return;
@@ -193,8 +184,7 @@ import {
   
               case "mute":
                 const muted = msgInt.guild?.roles.cache.find(
-                  (role) => role.name === "muted"
-                );
+                  (role) => role.name === "muted");
   
                 //Check user isn't muted already
                 if (punished.roles.cache.some((role) => role.name === "muted")) {
@@ -275,7 +265,7 @@ import {
   
                       if (rsn) {
                         punishedEmbed.setDescription(
-                          `${punished} was muted on the server until <t:${punishtime}:f> because they were ${rsn}`
+                          `${punished} was muted on the server until <t:${punishtime}:f>`
                         );
                         channel.send({ embeds: [punishedEmbed] });
                       } else {
@@ -344,7 +334,7 @@ import {
   
                       if (rsn) {
                         punishedEmbed.setDescription(
-                          `${punished} was muted on the server until <t:${punishtime}:f> because they were ${rsn}`
+                          `${punished} was muted on the server until <t:${punishtime}:f>`
                         );
                         channel.send({ embeds: [punishedEmbed] });
                       } else {
@@ -392,7 +382,6 @@ import {
                     //Minutes
                   }
                   if (search![1] === "m" || !nolength) {
-                    console.log("set to minutes");
                     console.log(newTimer);
                     const countDown = newTimer * 60000;
                     const punishtime = unixTimestamp + countDown / 1000;
@@ -417,7 +406,7 @@ import {
   
                       if (rsn) {
                         punishedEmbed.setDescription(
-                          `${punished} was muted on the server until <t:${punishtime}:f> because they were ${rsn}`
+                          `${punished} was muted on the server until <t:${punishtime}:f>`
                         );
                         channel.send({ embeds: [punishedEmbed] });
                       } else {
@@ -428,10 +417,8 @@ import {
                       }
   
                       setTimeout(async () => {
-                        console.log("timeout error");
                         punished.roles.remove(muted!.id);
                         punishedEmbed.setTimestamp();
-  
                         try {
                           punishedEmbed.setTitle("User was unmuted");
                           punishedEmbed.setDescription(
@@ -462,7 +449,6 @@ import {
                     });
                   }
                 } else if (!time) {
-                  console.log("made it here");
                   try {
                     punishedEmbed.setTitle("You have been muted");
                     if (rsn) {

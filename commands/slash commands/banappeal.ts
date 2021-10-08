@@ -1,4 +1,4 @@
-import { ButtonInteraction, MessageActionRow, MessageButton } from "discord.js";
+import { MessageComponentInteraction, MessageActionRow, MessageButton } from "discord.js";
 import { ICommand } from 'wokcommands';
 import { MessageEmbed } from "discord.js";
 
@@ -74,9 +74,11 @@ export default {
         ephemeral: true
         })
 
-        const filter = (btnInt: ButtonInteraction) => {
+        const filter = (btnInt: MessageComponentInteraction) => {
             return msgInt.user.id === btnInt.user.id
         }
+
+        console.log(filter)
 
         const collector = channel.createMessageComponentCollector({
             filter,

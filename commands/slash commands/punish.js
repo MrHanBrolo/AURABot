@@ -128,7 +128,7 @@ exports.default = {
                     switch (punishment) {
                         /////////////////////////////////////////////////////////////////////// KICK
                         /////////////////////////////////////////////////////////////////////// KICK
-                        /////////////////////////////////////////////////////////////////////// KICK
+                        /////////////////////////////////////////////////////////////////////// KICK 
                         case "kick":
                             //Tries to DM user and sends reason if provided - continues if not
                             try {
@@ -147,14 +147,7 @@ exports.default = {
                             yield ((_b = msgInt.guild) === null || _b === void 0 ? void 0 : _b.members.kick(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
                                 punishedEmbed.setTitle("User was kicked");
                                 punishedEmbed.setDescription(`${punished} was kicked from the server`);
-                                //if a reason is included, else none
-                                if (rsn) {
-                                    channel.send({ embeds: [punishedEmbed] });
-                                }
-                                else {
-                                    punishedEmbed.addField("Reason for kicking", "No reason given");
-                                    channel.send({ embeds: [punishedEmbed] });
-                                }
+                                channel.send({ embeds: [punishedEmbed] });
                                 if (sent) {
                                     yield msgInt.editReply({
                                         content: "Completed.",
@@ -167,6 +160,7 @@ exports.default = {
                                         content: "Completed but unable to DM user.",
                                         components: [],
                                     });
+                                    return;
                                 }
                             })));
                             return;
@@ -241,7 +235,7 @@ exports.default = {
                                     yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
                                         punishedEmbed.setTitle("User was muted");
                                         if (rsn) {
-                                            punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f> because they were ${rsn}`);
+                                            punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f>`);
                                             channel.send({ embeds: [punishedEmbed] });
                                         }
                                         else {
@@ -298,7 +292,7 @@ exports.default = {
                                     yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
                                         punishedEmbed.setTitle("User was muted");
                                         if (rsn) {
-                                            punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f> because they were ${rsn}`);
+                                            punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f>`);
                                             channel.send({ embeds: [punishedEmbed] });
                                         }
                                         else {
@@ -337,7 +331,6 @@ exports.default = {
                                     //Minutes
                                 }
                                 if (search[1] === "m" || !nolength) {
-                                    console.log("set to minutes");
                                     console.log(newTimer);
                                     const countDown = newTimer * 60000;
                                     const punishtime = unixTimestamp + countDown / 1000;
@@ -357,7 +350,7 @@ exports.default = {
                                     yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
                                         punishedEmbed.setTitle("User was muted");
                                         if (rsn) {
-                                            punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f> because they were ${rsn}`);
+                                            punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f>`);
                                             channel.send({ embeds: [punishedEmbed] });
                                         }
                                         else {
@@ -365,7 +358,6 @@ exports.default = {
                                             channel.send({ embeds: [punishedEmbed] });
                                         }
                                         setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
-                                            console.log("timeout error");
                                             punished.roles.remove(muted.id);
                                             punishedEmbed.setTimestamp();
                                             try {
@@ -395,7 +387,6 @@ exports.default = {
                                 }
                             }
                             else if (!time) {
-                                console.log("made it here");
                                 try {
                                     punishedEmbed.setTitle("You have been muted");
                                     if (rsn) {
