@@ -140,7 +140,7 @@ exports.default = {
                 words.indexOf("Partnered Server Owner") >= 0) {
                 partner = "Partnered Server Owner";
                 whoisEmbed.addFields({
-                    name: "Big Boi Status",
+                    name: "Noteable Other",
                     value: `${partner}`,
                 });
             }
@@ -150,7 +150,7 @@ exports.default = {
                 words.indexOf("Partnered Server Owner") === -1) {
                 discoEmployee = "Discord Employee";
                 whoisEmbed.addFields({
-                    name: "Special",
+                    name: "Noteable Other",
                     value: `${discoEmployee}`,
                 });
             }
@@ -160,7 +160,7 @@ exports.default = {
                 words.indexOf("Partnered Server Owner") === -1) {
                 moderator = "Discord Certified Moderator";
                 whoisEmbed.addFields({
-                    name: "Special",
+                    name: "Noteable Other",
                     value: `${moderator}`,
                 });
             }
@@ -170,7 +170,7 @@ exports.default = {
                 words.indexOf("Partnered Server Owner") >= 0) {
                 discoEmployee.join(`| ${partner}`);
                 whoisEmbed.addFields({
-                    name: "Special",
+                    name: "Noteable Other",
                     value: `${discoEmployee}`,
                 });
             }
@@ -180,7 +180,7 @@ exports.default = {
                 words.indexOf("Partnered Server Owner") >= 0) {
                 discoEmployee.join(`| ${partner} | ${moderator}`);
                 whoisEmbed.addFields({
-                    name: "Special",
+                    name: "Noteable Other",
                     value: `${discoEmployee}`,
                 });
             }
@@ -190,7 +190,7 @@ exports.default = {
                 words.indexOf("Partnered Server Owner") >= 0) {
                 partner.join(`| ${moderator}`);
                 whoisEmbed.addFields({
-                    name: "Special",
+                    name: "Noteable Other",
                     value: `${partner}`,
                 });
             }

@@ -156,7 +156,7 @@ export default {
       ) {
         partner = "Partnered Server Owner";
         whoisEmbed.addFields({
-          name: "Big Boi Status",
+          name: "Noteable Other",
           value: `${partner}`,
         });
       }
@@ -169,7 +169,7 @@ export default {
       ) {
         discoEmployee = "Discord Employee";
         whoisEmbed.addFields({
-          name: "Special",
+          name: "Noteable Other",
           value: `${discoEmployee}`,
         });
       }
@@ -182,7 +182,7 @@ export default {
       ) {
         moderator = "Discord Certified Moderator";
         whoisEmbed.addFields({
-          name: "Special",
+          name: "Noteable Other",
           value: `${moderator}`,
         });
       }
@@ -195,7 +195,7 @@ export default {
       ) {
         discoEmployee.join(`| ${partner}`);
         whoisEmbed.addFields({
-          name: "Special",
+          name: "Noteable Other",
           value: `${discoEmployee}`,
         });
       }
@@ -208,7 +208,7 @@ export default {
       ) {
         discoEmployee.join(`| ${partner} | ${moderator}`);
         whoisEmbed.addFields({
-          name: "Special",
+          name: "Noteable Other",
           value: `${discoEmployee}`,
         });
       }
@@ -221,7 +221,7 @@ export default {
       ) {
         partner.join(`| ${moderator}`);
         whoisEmbed.addFields({
-          name: "Special",
+          name: "Noteable Other",
           value: `${partner}`,
         });
       }
