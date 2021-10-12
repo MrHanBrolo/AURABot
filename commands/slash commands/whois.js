@@ -31,70 +31,72 @@ exports.default = {
     ],
     callback: ({ interaction: msgInt, channel }) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b;
-        // Functions
-        // Takes the first letter of each word, capitalises it, then attaches the letter back to the rest of the word
-        function sortArray(x) {
-            if (x === null || x === void 0 ? void 0 : x.length) {
-                for (let i = 0; i < (x === null || x === void 0 ? void 0 : x.length); i++) {
-                    for (let j = 0; j < x[i].length; j++) {
-                        x[i][j] = x[i][j][0].toUpperCase() + x[i][j].substring(1);
+        try {
+            // Functions
+            // Takes the first letter of each word, capitalises it, then attaches the letter back to the rest of the word
+            function sortArray(x) {
+                if (x === null || x === void 0 ? void 0 : x.length) {
+                    for (let i = 0; i < (x === null || x === void 0 ? void 0 : x.length); i++) {
+                        for (let j = 0; j < x[i].length; j++) {
+                            x[i][j] = x[i][j][0].toUpperCase() + x[i][j].substring(1);
+                        }
                     }
                 }
             }
-        }
-        // Gets UNIX timestamp for specified date (t)
-        function getDate(t) {
-            return Math.floor(new Date(t).getTime() / 1000);
-        }
-        // Variables
-        // Interaction Options
-        const whois = msgInt.options.getMember("user", true);
-        const detailed = msgInt.options.getBoolean("detailed", false);
-        //User data
-        const userPic = whois.displayAvatarURL({ format: "jpg" });
-        const userCreation = new Date(whois.user.createdAt);
-        const userJoin = new Date(whois.joinedAt);
-        const createdDate = userCreation.getTime();
-        const joinDate = userJoin.getTime();
-        const createdTimestamp = getDate(createdDate);
-        const joinedTimestamp = getDate(joinDate);
-        /*
-            Retrieves user roles and maps them to a new array, joining each role name into an single string seperated by a ' | ' e.g. @mod | @staff | @guineapig
-          */
-        const roles = yield whois.roles.cache.map((r) => `${r}`).join(" | ");
-        /*
-            Retrieves user flags (e.g. 'DISCORD_PARTNER') and maps them to a new array, removing the underscores, converting to lower case and
-            splitting the new words up into their own array (e.g. 'discord',  'partner')
+            // Gets UNIX timestamp for specified date (t)
+            function getDate(t) {
+                return Math.floor(new Date(t).getTime() / 1000);
+            }
+            // Variables
+            // Interaction Options
+            const whois = msgInt.options.getMember("user", true);
+            const detailed = msgInt.options.getBoolean("detailed", false);
+            //User data
+            const userPic = whois.displayAvatarURL({ format: "jpg" });
+            const userCreation = new Date(whois.user.createdAt);
+            const userJoin = new Date(whois.joinedAt);
+            const createdDate = userCreation.getTime();
+            const joinDate = userJoin.getTime();
+            const createdTimestamp = getDate(createdDate);
+            const joinedTimestamp = getDate(joinDate);
+            //Arrays
+            const noteableStatus = new Array();
+            /*
+              Retrieves user roles and maps them to a new array, joining each role name into an single string seperated by a ' | ' e.g. @mod | @staff | @guineapig
             */
-        let special = yield ((_a = whois.user.flags) === null || _a === void 0 ? void 0 : _a.toArray().map((s) => s.toLowerCase().replace(/_/g, " ").split(" ")));
-        // Creates array of permissions for user e.g. [['MANAGES_MESSAGES', 'MANAGE_ROLES', 'SEND MESSAGES']] etc..
-        const permCollection = whois.permissions.toArray();
-        //Placeholder variables
-        let newRoles;
-        let words;
-        let moderator;
-        let partner;
-        let discoEmployee;
-        let serverRank;
-        sortArray(special);
-        // Joins words back into singular string and removes any comma's e.g. ("Discord Partner House Brilliance Early Supporter")
-        words = special === null || special === void 0 ? void 0 : special.join().replace(/,/g, " ");
-        // Removes @ everyone role from list since all users have this role by default and it can't be removed, it's unecessary to show it.
-        if (roles.indexOf("| @everyone")) {
-            newRoles = roles.replace("| @everyone", "");
-        }
-        if (roles.indexOf("@everyone") === 0) {
-            newRoles = roles.replace("@everyone", "This user has no other roles. 😬");
-        } // RIP
-        const roleCount = newRoles.split(" | ");
-        // Embed to display information
-        const whoisEmbed = new discord_js_1.MessageEmbed()
-            .setColor("#330034")
-            .setAuthor(`${whois.user.tag}`)
-            .setThumbnail(`${userPic}`)
-            .setTimestamp()
-            .setFooter(`Brought to you by @AURABot`);
-        try {
+            const roles = yield whois.roles.cache.map((r) => `${r}`).join(" | ");
+            /*
+              Retrieves user flags (e.g. 'DISCORD_PARTNER') and maps them to a new array, removing the underscores, converting to lower case and
+              splitting the new words up into their own array (e.g. 'discord',  'partner')
+              */
+            let special = yield ((_a = whois.user.flags) === null || _a === void 0 ? void 0 : _a.toArray().map((s) => s.toLowerCase().replace(/_/g, " ").split(" ")));
+            // Creates array of permissions for user e.g. [['MANAGES_MESSAGES', 'MANAGE_ROLES', 'SEND MESSAGES']] etc..
+            const permCollection = whois.permissions.toArray();
+            //Placeholder variables
+            let newRoles;
+            let words;
+            let moderator;
+            let partner;
+            let discoEmployee;
+            let serverRank;
+            sortArray(special);
+            // Joins words back into singular string and removes any comma's e.g. ("Discord Partner House Brilliance Early Supporter")
+            words = special === null || special === void 0 ? void 0 : special.join().replace(/,/g, " ");
+            // Removes @ everyone role from list since all users have this role by default and it can't be removed, it's unecessary to show it.
+            if (roles.indexOf("| @everyone")) {
+                newRoles = roles.replace("| @everyone", "");
+            }
+            if (roles.indexOf("@everyone") === 0) {
+                newRoles = roles.replace("@everyone", "This user has no other roles. 😬");
+            } // RIP
+            const roleCount = newRoles.split(" | ");
+            // Embed to display information
+            const whoisEmbed = new discord_js_1.MessageEmbed()
+                .setColor("#330034")
+                .setAuthor(`${whois.user.tag}`)
+                .setThumbnail(`${userPic}`)
+                .setTimestamp()
+                .setFooter(`Brought to you by @AURABot`);
             whoisEmbed.addFields({
                 name: "Date user joined 🕔",
                 value: `<t:${joinedTimestamp}:f>`,
@@ -118,7 +120,6 @@ exports.default = {
                 serverRank = "Server Owner 👑";
             }
             if (!serverRank) {
-                console.log(permCollection);
                 if (permCollection.indexOf("ADMINISTRATOR") >= 0) {
                     serverRank = "Administrator";
                 }
@@ -134,64 +135,26 @@ exports.default = {
                 whoisEmbed.addField("Special", serverRank);
             }
             //This section checks for the three notable main Discord perks and lists them in, what is in my opinion, the most prominent order
-            //Partnered server only
-            if (words.indexOf("Discord Certified Moderator") === -1 &&
-                words.indexOf("Discord Employee") === -1 &&
-                words.indexOf("Partnered Server Owner") >= 0) {
+            //Partnered server owner
+            if (words.indexOf("Partnered Server Owner") >= 0) {
                 partner = "Partnered Server Owner";
-                whoisEmbed.addFields({
-                    name: "Noteable Other",
-                    value: `${partner}`,
-                });
+                noteableStatus.push(partner);
             }
-            //Discord Employee only
-            if (words.indexOf("Discord Certified Moderator") === -1 &&
-                words.indexOf("Discord Employee") >= 0 &&
-                words.indexOf("Partnered Server Owner") === -1) {
+            //Discord Employee
+            if (words.indexOf("Discord Employee") >= 0) {
                 discoEmployee = "Discord Employee";
-                whoisEmbed.addFields({
-                    name: "Noteable Other",
-                    value: `${discoEmployee}`,
-                });
+                noteableStatus.push(discoEmployee);
             }
-            //Discord cert. mod only
-            if (words.indexOf("Discord Certified Moderator") >= 0 &&
-                words.indexOf("Discord Employee") == -1 &&
-                words.indexOf("Partnered Server Owner") === -1) {
+            //Discord cert. mod
+            if (words.indexOf("Discord Certified Moderator") >= 0) {
                 moderator = "Discord Certified Moderator";
-                whoisEmbed.addFields({
-                    name: "Noteable Other",
-                    value: `${moderator}`,
-                });
+                noteableStatus.push(moderator);
             }
-            //Discord Employee AND Partner
-            if (words.indexOf("Discord Certified Moderator") === -1 &&
-                words.indexOf("Discord Employee") >= 0 &&
-                words.indexOf("Partnered Server Owner") >= 0) {
-                discoEmployee.join(`| ${partner}`);
+            if (noteableStatus.length > 0) {
+                const noteableString = noteableStatus.join(" | ");
                 whoisEmbed.addFields({
-                    name: "Noteable Other",
-                    value: `${discoEmployee}`,
-                });
-            }
-            //Discord Employee, Partner and Moderator
-            if (words.indexOf("Discord Certified Moderator") >= 0 &&
-                words.indexOf("Discord Employee") >= 0 &&
-                words.indexOf("Partnered Server Owner") >= 0) {
-                discoEmployee.join(`| ${partner} | ${moderator}`);
-                whoisEmbed.addFields({
-                    name: "Noteable Other",
-                    value: `${discoEmployee}`,
-                });
-            }
-            //Discord Partner and Moderator
-            if (words.indexOf("Discord Certified Moderator") >= 0 &&
-                words.indexOf("Discord Employee") === -1 &&
-                words.indexOf("Partnered Server Owner") >= 0) {
-                partner.join(`| ${moderator}`);
-                whoisEmbed.addFields({
-                    name: "Noteable Other",
-                    value: `${partner}`,
+                    name: "Notable Other",
+                    value: `${noteableString}`,
                 });
             }
             //If user sets detailed view to true, displays a list of what I felt to be notable permissions. i.e. What are dangerous permissions to grant.
@@ -236,8 +199,15 @@ exports.default = {
         catch (error) {
             if (error instanceof TypeError &&
                 error.name === "TypeError [COMMAND_INTERACTION_OPTION_EMPTY]") {
-                msgInt.editReply({
+                msgInt.reply({
                     content: "User is not in guild.",
+                    components: [],
+                });
+            }
+            if (error instanceof TypeError &&
+                error.name === "TypeError [INTERACION_NOT_REPLIED]") {
+                msgInt.reply({
+                    content: "Unable to perform command.",
                     components: [],
                 });
             }
