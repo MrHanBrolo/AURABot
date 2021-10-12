@@ -29,14 +29,14 @@ export default {
         if (x?.length) {
           for (let i = 0; i < x?.length; i++) {
             for (let j = 0; j < x[i].length; j++) {
-              x[i][j] = x[i][j][0].toUpperCase() + x[i][j].substring(1);
+              x[i][j] = x[i][j][0].toUpperCase() + x[i][j].substring(1)
             }
           }
         }
       }
       // Gets UNIX timestamp for specified date (t)
       function getDate(t) {
-        return Math.floor(new Date(t).getTime() / 1000);
+        return Math.floor(new Date(t).getTime() / 1000)
       }
 
       // Variables
@@ -45,54 +45,53 @@ export default {
       const detailed = msgInt.options.getBoolean("detailed", false) as Boolean;
 
       //User data
-      const userPic = whois.displayAvatarURL({ format: "jpg" });
-      const userCreation = new Date(whois.user.createdAt);
-      const userJoin = new Date(whois.joinedAt as Date);
-      const createdDate = userCreation.getTime();
-      const joinDate = userJoin.getTime();
-      const createdTimestamp = getDate(createdDate);
-      const joinedTimestamp = getDate(joinDate);
+      const userPic = whois.displayAvatarURL({ format: "jpg" })
+      const userCreation = new Date(whois.user.createdAt)
+      const userJoin = new Date(whois.joinedAt as Date)
+      const createdDate = userCreation.getTime()
+      const joinDate = userJoin.getTime()
+      const createdTimestamp = getDate(createdDate)
+      const joinedTimestamp = getDate(joinDate)
 
       //Arrays
-      const noteableStatus = new Array();
+      const noteableStatus = new Array()
 
       /*
         Retrieves user roles and maps them to a new array, joining each role name into an single string seperated by a ' | ' e.g. @mod | @staff | @guineapig 
       */
-      const roles = await whois.roles.cache.map((r) => `${r}`).join(" | ");
+      const roles = await whois.roles.cache.map((r) => `${r}`).join(" | ")
 
       /*
         Retrieves user flags (e.g. 'DISCORD_PARTNER') and maps them to a new array, removing the underscores, converting to lower case and 
         splitting the new words up into their own array (e.g. 'discord',  'partner')
         */
       let special = await whois.user.flags
-        ?.toArray()
-        .map((s) => s.toLowerCase().replace(/_/g, " ").split(" "));
+        ?.toArray().map((s) => s.toLowerCase().replace(/_/g, " ").split(" "))
 
       // Creates array of permissions for user e.g. [['MANAGES_MESSAGES', 'MANAGE_ROLES', 'SEND MESSAGES']] etc..
       const permCollection = whois.permissions.toArray();
 
       //Placeholder variables
-      let newRoles;
-      let words;
-      let moderator;
-      let partner;
-      let discoEmployee;
-      let serverRank;
+      let newRoles
+      let words
+      let moderator
+      let partner
+      let discoEmployee
+      let serverRank
 
-      sortArray(special);
+      sortArray(special)
 
       // Joins words back into singular string and removes any comma's e.g. ("Discord Partner House Brilliance Early Supporter")
-      words = special?.join().replace(/,/g, " ");
+      words = special?.join().replace(/,/g, " ")
 
       // Removes @ everyone role from list since all users have this role by default and it can't be removed, it's unecessary to show it.
       if (roles.indexOf("| @everyone")) {
-        newRoles = roles.replace("| @everyone", "");
+        newRoles = roles.replace("| @everyone", "")
       }
       if (roles.indexOf("@everyone") === 0) {
         newRoles = roles.replace("@everyone","This user has no other roles. 😬")} // RIP
       
-      const roleCount = newRoles.split(" | ");
+      const roleCount = newRoles.split(" | ")
 
       // Embed to display information
       const whoisEmbed = new MessageEmbed()
@@ -100,7 +99,7 @@ export default {
         .setAuthor(`${whois.user.tag}`)
         .setThumbnail(`${userPic}`)
         .setTimestamp()
-        .setFooter(`Brought to you by @AURABot`);
+        .setFooter(`Brought to you by @AURABot`)
 
       whoisEmbed.addFields(
         {
