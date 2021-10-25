@@ -32,15 +32,11 @@ const BOT = new discord_js_1.default.Client({
         discord_js_1.Intents.FLAGS.GUILDS,
         discord_js_1.Intents.FLAGS.GUILD_MESSAGES,
         discord_js_1.Intents.FLAGS.DIRECT_MESSAGES,
-        discord_js_1.Intents.FLAGS.GUILD_MEMBERS,
         discord_js_1.Intents.FLAGS.GUILD_MEMBERS
     ]
 });
-function consolog(statement) {
-    return console.log(statement);
-}
 for (const file of eventFiles) {
-    const event = require(`./events/${file}`);
+    const event = require(`../events/${file}`);
     if (event.once) {
         BOT.once(event.name, (...args) => event.execute(...args));
     }

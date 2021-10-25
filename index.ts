@@ -12,9 +12,16 @@ const BOT = new DiscordJS.Client({
       Intents.FLAGS.GUILDS,
       Intents.FLAGS.GUILD_MESSAGES,
       Intents.FLAGS.DIRECT_MESSAGES,
+      Intents.FLAGS.GUILD_MEMBERS,
       Intents.FLAGS.GUILD_MEMBERS
   ]    
 })
+
+function consolog(statement){
+  return console.log(statement)
+}
+
+
 
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);

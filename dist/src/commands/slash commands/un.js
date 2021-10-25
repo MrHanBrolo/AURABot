@@ -47,18 +47,14 @@ exports.default = {
             .setCustomId("mutedusers")
             .setPlaceholder("None Selected");
         const userRow = new discord_js_1.MessageActionRow();
-        const punishRow = new discord_js_1.MessageActionRow()
-            .addComponents(new discord_js_1.MessageButton()
-            .setCustomId("punish_yes")
-            .setLabel("Confirm")
-            .setStyle("SUCCESS"))
-            .addComponents(new discord_js_1.MessageButton()
-            .setCustomId("punish_no")
-            .setLabel("Cancel")
-            .setStyle("DANGER"));
         const filter = (btnInt) => {
             return msgInt.user.id === btnInt.user.id;
         };
+        const collector = channel.createMessageComponentCollector({
+            filter,
+            max: 1,
+            time: 1000 * 15,
+        });
         const unpunishedEmbed = new discord_js_1.MessageEmbed()
             .setColor("#76b900")
             .setAuthor(`Action performed by: ${kicker}`)
