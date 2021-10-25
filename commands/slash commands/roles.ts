@@ -46,11 +46,6 @@ export default {
     const filter = (btnInt: MessageComponentInteraction) => {
       return msgInt.user.id === btnInt.user.id;
     };
-    const collector = channel.createMessageComponentCollector({
-      filter,
-      max: 1,
-      time: 1000 * 15,
-    });
 
     const unpunishedEmbed = new MessageEmbed()
       .setColor("#76b900")

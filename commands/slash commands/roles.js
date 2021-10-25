@@ -41,11 +41,6 @@ exports.default = {
         const filter = (btnInt) => {
             return msgInt.user.id === btnInt.user.id;
         };
-        const collector = channel.createMessageComponentCollector({
-            filter,
-            max: 1,
-            time: 1000 * 15,
-        });
         const unpunishedEmbed = new discord_js_1.MessageEmbed()
             .setColor("#76b900")
             .setAuthor(`Action performed by: ${invoker}`)
