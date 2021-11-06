@@ -33,7 +33,8 @@ const BOT = new discord_js_1.default.Client({
         discord_js_1.Intents.FLAGS.GUILD_MESSAGES,
         discord_js_1.Intents.FLAGS.DIRECT_MESSAGES,
         discord_js_1.Intents.FLAGS.GUILD_MEMBERS,
-        discord_js_1.Intents.FLAGS.GUILD_MEMBERS
+        discord_js_1.Intents.FLAGS.GUILD_MEMBERS,
+        discord_js_1.Intents.FLAGS.GUILD_PRESENCES
     ]
 });
 function consolog(statement) {

@@ -103,6 +103,15 @@ import {
             .setStyle("DANGER")
         );
   
+        const timeRow = new MessageActionRow()
+    
+        .addComponents(
+          new MessageButton()
+            .setLabel("View Wiki Page")
+            .setStyle("LINK")
+            .setURL("https://github.com/MrHanBrolo/AURABot/wiki/Punish-Command#valid-syntax-for-time")
+        )
+
       await msgInt.reply({
         content: "Are you sure?",
         components: [punishRow],
@@ -275,7 +284,6 @@ import {
                       setTimeout(async () => {
                         punished.roles.remove(muted!.id);
                         punishedEmbed.setTimestamp();
-                        try {
                           punishedEmbed.setTitle("User was unmuted");
                           punishedEmbed.setDescription(
                             `You are no longer muted on the server.`
@@ -283,8 +291,6 @@ import {
                           await punished?.send({ embeds: [punishedEmbed] });
   
                           sent = true;
-                        } catch (err) {}
-  
                         punishedEmbed.setDescription(
                           `${punished} has served their time and been unmuted.`
                         );
@@ -572,8 +578,8 @@ import {
             case "Invalid input":
               await msgInt.editReply({
                 content:
-                  "Time must be specified as <number><d , m , h> OR <number>(will default to minutes).",
-                components: [],
+                  "Time must be specified as <number> <d , m , h> OR <number> (will default to minutes).",
+                components: [timeRow],
               });
               break;
           }

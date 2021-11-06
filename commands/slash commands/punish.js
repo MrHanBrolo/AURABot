@@ -98,6 +98,11 @@ exports.default = {
             .setCustomId("punish_no")
             .setLabel("Cancel")
             .setStyle("DANGER"));
+        const timeRow = new discord_js_1.MessageActionRow()
+            .addComponents(new discord_js_1.MessageButton()
+            .setLabel("View Wiki Page")
+            .setStyle("LINK")
+            .setURL("https://github.com/MrHanBrolo/AURABot/wiki/Punish-Command#valid-syntax-for-time"));
         yield msgInt.reply({
             content: "Are you sure?",
             components: [punishRow],
@@ -243,13 +248,10 @@ exports.default = {
                                         setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
                                             punished.roles.remove(muted.id);
                                             punishedEmbed.setTimestamp();
-                                            try {
-                                                punishedEmbed.setTitle("User was unmuted");
-                                                punishedEmbed.setDescription(`You are no longer muted on the server.`);
-                                                yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                                sent = true;
-                                            }
-                                            catch (err) { }
+                                            punishedEmbed.setTitle("User was unmuted");
+                                            punishedEmbed.setDescription(`You are no longer muted on the server.`);
+                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
+                                            sent = true;
                                             punishedEmbed.setDescription(`${punished} has served their time and been unmuted.`);
                                             channel.send({ embeds: [punishedEmbed] });
                                         }), countDown);
@@ -492,8 +494,8 @@ exports.default = {
                         break;
                     case "Invalid input":
                         yield msgInt.editReply({
-                            content: "Time must be specified as <number><d , m , h> OR <number>(will default to minutes).",
-                            components: [],
+                            content: "Time must be specified as <number> <d , m , h> OR <number> (will default to minutes).",
+                            components: [timeRow],
                         });
                         break;
                 }

@@ -12,12 +12,14 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/rest": "^0.1.0-canary.0",
-    "canvas": "^2.8.0",
+    "@supercharge/strings": "^1.22.0",
     "concurrently": "^6.2.2",
     "discord-api-types": "^0.23.1",
     "dotenv": "^10.0.0",
     "mongoose": "^6.0.8",
-    "wokcommands": "^1.5.1"
+    "skia-canvas": "^0.9.27",
+    "stackblur-canvas": "^2.5.0",
+    "wokcommands": "^1.5.3"
   },
   "devDependencies": {
     "typescript": "^4.4.3"
