@@ -98,6 +98,10 @@ exports.default = {
             .setCustomId("punish_no")
             .setLabel("Cancel")
             .setStyle("DANGER"));
+        const helpRowMuteRole = new discord_js_1.MessageActionRow().addComponents(new discord_js_1.MessageButton()
+            .setLabel("View Wiki Page")
+            .setStyle("LINK")
+            .setURL("https://github.com/MrHanBrolo/AURABot/wiki/Punish-Command#about-the-mute-role"));
         const timeRow = new discord_js_1.MessageActionRow()
             .addComponents(new discord_js_1.MessageButton()
             .setLabel("View Wiki Page")
@@ -117,7 +121,7 @@ exports.default = {
             time: 1000 * 15,
         });
         collector.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
-            var _a, _b, _c, _d, _e;
+            var _a, _b, _c, _d, _e, _f;
             try {
                 if (((_a = collection.first()) === null || _a === void 0 ? void 0 : _a.customId) === "punish_yes") {
                     // command checks
@@ -174,6 +178,17 @@ exports.default = {
                         /////////////////////////////////////////////////////////////////////// MUTE
                         case "mute":
                             const muted = (_c = msgInt.guild) === null || _c === void 0 ? void 0 : _c.roles.cache.find((role) => role.name === "muted");
+                            if (!muted) {
+                                (_d = msgInt.guild) === null || _d === void 0 ? void 0 : _d.roles.create({
+                                    name: 'muted',
+                                    color: '#8E8E8E',
+                                    hoist: false,
+                                    permissions: ['VIEW_CHANNEL'],
+                                    position: 20,
+                                    reason: 'Muted role did not exist.'
+                                });
+                                throw "no role";
+                            }
                             //Check user isn't muted already
                             if (punished.roles.cache.some((role) => role.name === "muted")) {
                                 throw `already punished`;
@@ -431,7 +446,7 @@ exports.default = {
                         /////////////////////////////////////////////////////////////////////// BAN
                         case "ban":
                             //Waits for member kick then sends embed giving details
-                            yield ((_d = msgInt.guild) === null || _d === void 0 ? void 0 : _d.members.ban(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
+                            yield ((_e = msgInt.guild) === null || _e === void 0 ? void 0 : _e.members.ban(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
                                 punishedEmbed.setTitle("User was banned");
                                 punishedEmbed.setDescription(`${punished} was banned from the server`);
                                 //if a reason is included, else none
@@ -453,7 +468,7 @@ exports.default = {
                             return;
                     }
                 }
-                else if (((_e = collection.first()) === null || _e === void 0 ? void 0 : _e.customId) === "punish_no") {
+                else if (((_f = collection.first()) === null || _f === void 0 ? void 0 : _f.customId) === "punish_no") {
                     msgInt.editReply({
                         content: "Action cancelled",
                         components: [],
@@ -469,33 +484,39 @@ exports.default = {
                         });
                         break;
                     case `already muted`:
-                        yield msgInt.editReply({
+                        msgInt.editReply({
                             content: `${punished} is already muted.`,
                             components: [],
                         });
                         break;
                     case `already banned`:
-                        yield msgInt.editReply({
+                        msgInt.editReply({
                             content: `${punished} is already banned.`,
                             components: [],
                         });
                         break;
                     case `already kicked`:
-                        yield msgInt.editReply({
+                        msgInt.editReply({
                             content: `${punished} is not in the server.`,
                             components: [],
                         });
                         break;
                     case "toolong":
-                        yield msgInt.editReply({
+                        msgInt.editReply({
                             content: "Time must be less than 14 days. E.g. 3d, 1300m, 8h.",
-                            components: [],
+                            components: [timeRow],
                         });
                         break;
                     case "Invalid input":
-                        yield msgInt.editReply({
+                        msgInt.editReply({
                             content: "Time must be specified as <number> <d , m , h> OR <number> (will default to minutes).",
                             components: [timeRow],
+                        });
+                        break;
+                    case `no role`:
+                        msgInt.editReply({
+                            content: `Muted role did not exist, created role. Please refer to documentation.`,
+                            components: [helpRowMuteRole],
                         });
                         break;
                 }

@@ -102,6 +102,13 @@ import {
             .setLabel("Cancel")
             .setStyle("DANGER")
         );
+
+        const helpRowMuteRole = new MessageActionRow().addComponents(
+          new MessageButton()
+            .setLabel("View Wiki Page")
+            .setStyle("LINK")
+            .setURL("https://github.com/MrHanBrolo/AURABot/wiki/Punish-Command#about-the-mute-role")
+        );
   
         const timeRow = new MessageActionRow()
     
@@ -193,7 +200,19 @@ import {
   
               case "mute":
                 const muted = msgInt.guild?.roles.cache.find(
-                  (role) => role.name === "muted");
+                  (role) => role.name === "muted")
+                
+                  if(!muted){
+                        msgInt.guild?.roles.create({
+                            name: 'muted',
+                            color: '#8E8E8E',
+                            hoist: false,
+                            permissions: ['VIEW_CHANNEL'],
+                            position: 20,
+                            reason: 'Muted role did not exist.'
+                        })
+                        throw "no role"    
+                    }
   
                 //Check user isn't muted already
                 if (punished.roles.cache.some((role) => role.name === "muted")) {
@@ -548,40 +567,47 @@ import {
               break;
   
             case `already muted`:
-              await msgInt.editReply({
+              msgInt.editReply({
                 content: `${punished} is already muted.`,
                 components: [],
               });
               break;
 
               case `already banned`:
-              await msgInt.editReply({
+              msgInt.editReply({
                 content: `${punished} is already banned.`,
                 components: [],
               });
               break;
 
               case `already kicked`:
-                await msgInt.editReply({
+                msgInt.editReply({
                   content: `${punished} is not in the server.`,
                   components: [],
                 });
                 break;
   
             case "toolong":
-              await msgInt.editReply({
+              msgInt.editReply({
                 content: "Time must be less than 14 days. E.g. 3d, 1300m, 8h.",
-                components: [],
+                components: [timeRow],
               });
               break;
   
             case "Invalid input":
-              await msgInt.editReply({
+              msgInt.editReply({
                 content:
                   "Time must be specified as <number> <d , m , h> OR <number> (will default to minutes).",
                 components: [timeRow],
               });
               break;
+
+              case `no role`:
+                msgInt.editReply({
+                  content: `Muted role did not exist, created role. Please refer to documentation.`,
+                  components: [helpRowMuteRole],
+                });
+                break;
           }
   
           if (

@@ -214,9 +214,9 @@ exports.default = {
                     });
                 });
                 console.log(activities);
-                const playing = activities.find(a => a.type === "PLAYING");
-                const listening = activities.find(a => a.type === "LISTENING");
-                const custom = activities.find(a => a.type === "CUSTOM");
+                const playing = yield activities.find(a => a.type === "PLAYING");
+                const listening = yield activities.find(a => a.type === "LISTENING");
+                const custom = yield activities.find(a => a.type === "CUSTOM");
                 // playing game
                 if (playing && !listening && !custom) {
                     ctx.font = "18pt sans-serif";
@@ -226,7 +226,7 @@ exports.default = {
                 else if (listening && !playing && !custom) {
                     ctx.drawImage(spl, canvas.width / 2.2, canvas.height / 7, 43.52, 32);
                     ctx.font = "18pt sans-serif";
-                    wrapText(ctx, `Listening to ${playing.details} by ${playing.state}`, canvas.width / 2.77, canvas.height / 1.8, canvas.width - 300, 30);
+                    wrapText(ctx, `Listening to ${listening.details} by ${listening.state}`, canvas.width / 2.77, canvas.height / 1.8, canvas.width - 300, 30);
                 }
                 //custom status
                 else if (custom && !listening && !playing) {
