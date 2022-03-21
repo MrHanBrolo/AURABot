@@ -8,13 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = require("discord.js");
+const log_schema_1 = __importDefault(require("../../models/log-schema"));
 exports.default = {
     category: "Testing",
     description: "Moderation Tool for ban / kick / mute",
     slash: true,
     testOnly: true,
+    guildOnly: true,
     options: [
         {
             name: "ban",
@@ -80,7 +85,7 @@ exports.default = {
             ],
         },
     ],
-    callback: ({ interaction: msgInt, channel }) => __awaiter(void 0, void 0, void 0, function* () {
+    callback: ({ interaction: msgInt, channel, guild, member: staff }) => __awaiter(void 0, void 0, void 0, function* () {
         const timeElapsed = Date.now();
         const unixTimestamp = Math.floor(new Date(timeElapsed).getTime() / 1000);
         const punished = msgInt.options.getMember("user", true);
@@ -88,6 +93,7 @@ exports.default = {
         const punishment = msgInt.options.getSubcommand();
         const time = msgInt.options.getString("time");
         const kicker = msgInt.user.tag;
+        const userExists = yield log_schema_1.default.exists({ userId: punished === null || punished === void 0 ? void 0 : punished.id });
         let sent = false;
         const punishRow = new discord_js_1.MessageActionRow()
             .addComponents(new discord_js_1.MessageButton()
@@ -121,15 +127,20 @@ exports.default = {
             time: 1000 * 15,
         });
         collector.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
-            var _a, _b, _c, _d, _e, _f;
+            var _a, _b;
             try {
                 if (((_a = collection.first()) === null || _a === void 0 ? void 0 : _a.customId) === "punish_yes") {
                     // command checks
                     const punishedEmbed = new discord_js_1.MessageEmbed()
-                        .setColor("#76b900")
-                        .setAuthor(`Action performed by: ${kicker}`)
+                        .setColor("#DE1F1F")
+                        .setAuthor({ name: `Action performed by: ${kicker}` })
                         .setTimestamp()
-                        .setFooter("Remember to behave!");
+                        .setFooter({ text: "Remember to behave!" });
+                    const unpunishedEmbed = new discord_js_1.MessageEmbed()
+                        .setColor("#2BDE1F")
+                        .setAuthor({ name: `Action performed by: ${kicker}` })
+                        .setTimestamp()
+                        .setFooter({ text: "Remember to behave!" });
                     //Checks if specified user is able to be punished and exists in the server
                     if (!punished.kickable || !punished.bannable) {
                         throw `You can't ${punishment} this user!`;
@@ -153,7 +164,7 @@ exports.default = {
                                 sent = true;
                             }
                             catch (err) { }
-                            yield ((_b = msgInt.guild) === null || _b === void 0 ? void 0 : _b.members.kick(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
+                            yield (guild === null || guild === void 0 ? void 0 : guild.members.kick(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
                                 punishedEmbed.setTitle("User was kicked");
                                 punishedEmbed.setDescription(`${punished} was kicked from the server`);
                                 channel.send({ embeds: [punishedEmbed] });
@@ -177,9 +188,9 @@ exports.default = {
                         /////////////////////////////////////////////////////////////////////// MUTE
                         /////////////////////////////////////////////////////////////////////// MUTE
                         case "mute":
-                            const muted = (_c = msgInt.guild) === null || _c === void 0 ? void 0 : _c.roles.cache.find((role) => role.name === "muted");
+                            const muted = guild === null || guild === void 0 ? void 0 : guild.roles.cache.find((role) => role.name === "muted");
                             if (!muted) {
-                                (_d = msgInt.guild) === null || _d === void 0 ? void 0 : _d.roles.create({
+                                guild === null || guild === void 0 ? void 0 : guild.roles.create({
                                     name: 'muted',
                                     color: '#8E8E8E',
                                     hoist: false,
@@ -234,24 +245,40 @@ exports.default = {
                                 }
                                 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////Hours
                                 if (search[1] === "h") {
-                                    console.log("set to hours");
                                     const countDown = newTimer * 3600000;
                                     const punishtime = unixTimestamp + countDown / 1000;
-                                    try {
-                                        punishedEmbed.setTitle("You have been muted");
-                                        if (rsn) {
-                                            punishedEmbed.addField("Reason for mute", `${rsn}`);
-                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                        }
-                                        else {
-                                            punishedEmbed.addField("Reason for mute", "No reason given");
-                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                        }
-                                        sent = true;
+                                    punishedEmbed.setTitle("⚠️ You have been muted");
+                                    if (rsn) {
+                                        punishedEmbed.addField("Reason for mute", `${rsn}`);
+                                        yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
                                     }
-                                    catch (err) { }
+                                    else {
+                                        punishedEmbed.addField("Reason for mute", "No reason given");
+                                        yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
+                                    }
+                                    sent = true;
                                     yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
-                                        punishedEmbed.setTitle("User was muted");
+                                        punishedEmbed.setTitle("⚠️ User was muted");
+                                        ///////////////////////////////////////////////////////////////////////////////////////////// add mute to DB
+                                        /*
+                                                              if(!userExists){
+                                                                let warning = await logSchema.create({
+                                                                    userId: punished.id,
+                                                                    guildId: guild?.id,
+                                                                    mutes: [{ reason: rsn, time: punishtime, staffId: kicker }] })
+                                                
+                                                            } else {
+                                                                await logSchema.findOneAndUpdate(
+                                                                    {
+                                                                        userId: punished.id,
+                                                                        guildId: guild?.id
+                                                                    },
+                                                                    {
+                                                                    $push: {
+                                                                      mutes: [{ reason: rsn, time: punishtime, staffId: kicker }] } })
+                                                                }
+                                        */
+                                        ///////////////////////////////////////////////////////////////////////////////////////////// add mute to DB
                                         if (rsn) {
                                             punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f>`);
                                             channel.send({ embeds: [punishedEmbed] });
@@ -262,13 +289,13 @@ exports.default = {
                                         }
                                         setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
                                             punished.roles.remove(muted.id);
-                                            punishedEmbed.setTimestamp();
-                                            punishedEmbed.setTitle("User was unmuted");
-                                            punishedEmbed.setDescription(`You are no longer muted on the server.`);
-                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
+                                            unpunishedEmbed.setTimestamp();
+                                            unpunishedEmbed.setTitle("⚠️ User was unmuted");
+                                            unpunishedEmbed.setDescription(`You are no longer muted on the server.`);
+                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [unpunishedEmbed] }));
                                             sent = true;
-                                            punishedEmbed.setDescription(`${punished} has served their time and been unmuted.`);
-                                            channel.send({ embeds: [punishedEmbed] });
+                                            unpunishedEmbed.setDescription(`${punished} has served their time and been unmuted.`);
+                                            channel.send({ embeds: [unpunishedEmbed] });
                                         }), countDown);
                                         if (sent) {
                                             yield msgInt.editReply({
@@ -291,21 +318,18 @@ exports.default = {
                                 if (search[1] === "d") {
                                     const countDown = newTimer * 86400000;
                                     const punishtime = unixTimestamp + countDown / 1000;
-                                    try {
-                                        punishedEmbed.setTitle("You have been muted");
-                                        if (rsn) {
-                                            punishedEmbed.addField("Reason for mute", `${rsn}`);
-                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                        }
-                                        else {
-                                            punishedEmbed.addField("Reason for mute", "No reason given");
-                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                        }
-                                        sent = true;
+                                    punishedEmbed.setTitle("⚠️ You have been muted");
+                                    if (rsn) {
+                                        punishedEmbed.addField("Reason for mute", `${rsn}`);
+                                        yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
                                     }
-                                    catch (err) { }
+                                    else {
+                                        punishedEmbed.addField("Reason for mute", "No reason given");
+                                        yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
+                                    }
+                                    sent = true;
                                     yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
-                                        punishedEmbed.setTitle("User was muted");
+                                        punishedEmbed.setTitle("⚠️ User was muted");
                                         if (rsn) {
                                             punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f>`);
                                             channel.send({ embeds: [punishedEmbed] });
@@ -316,16 +340,13 @@ exports.default = {
                                         }
                                         setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
                                             punished.roles.remove(muted.id);
-                                            punishedEmbed.setTimestamp();
-                                            try {
-                                                punishedEmbed.setTitle("User was unmuted");
-                                                punishedEmbed.setDescription(`You are no longer muted on the server.`);
-                                                yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                                sent = true;
-                                            }
-                                            catch (err) { }
-                                            punishedEmbed.setDescription(`${punished} has served their time and been unmuted.`);
-                                            channel.send({ embeds: [punishedEmbed] });
+                                            unpunishedEmbed.setTimestamp();
+                                            unpunishedEmbed.setTitle("⚠️ User was unmuted");
+                                            unpunishedEmbed.setDescription(`You are no longer muted on the server.`);
+                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [unpunishedEmbed] }));
+                                            sent = true;
+                                            unpunishedEmbed.setDescription(`${punished} has served their time and been unmuted.`);
+                                            channel.send({ embeds: [unpunishedEmbed] });
                                         }), countDown);
                                         if (sent) {
                                             yield msgInt.editReply({
@@ -346,24 +367,20 @@ exports.default = {
                                     //Minutes
                                 }
                                 if (search[1] === "m" || !nolength) {
-                                    console.log(newTimer);
                                     const countDown = newTimer * 60000;
                                     const punishtime = unixTimestamp + countDown / 1000;
-                                    try {
-                                        punishedEmbed.setTitle("You have been muted");
-                                        if (rsn) {
-                                            punishedEmbed.addField("Reason for mute", `${rsn}`);
-                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                        }
-                                        else {
-                                            punishedEmbed.addField("Reason for mute", "No reason given");
-                                            yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                        }
-                                        sent = true;
+                                    punishedEmbed.setTitle("⚠️ You have been muted");
+                                    if (rsn) {
+                                        punishedEmbed.addField("Reason for mute", `${rsn}`);
+                                        yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
                                     }
-                                    catch (err) { }
+                                    else {
+                                        punishedEmbed.addField("Reason for mute", "No reason given");
+                                        yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
+                                    }
+                                    sent = true;
                                     yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
-                                        punishedEmbed.setTitle("User was muted");
+                                        punishedEmbed.setTitle("⚠️ User was muted");
                                         if (rsn) {
                                             punishedEmbed.setDescription(`${punished} was muted on the server until <t:${punishtime}:f>`);
                                             channel.send({ embeds: [punishedEmbed] });
@@ -374,15 +391,15 @@ exports.default = {
                                         }
                                         setTimeout(() => __awaiter(void 0, void 0, void 0, function* () {
                                             punished.roles.remove(muted.id);
-                                            punishedEmbed.setTimestamp();
+                                            unpunishedEmbed.setTimestamp();
                                             try {
-                                                punishedEmbed.setTitle("User was unmuted");
-                                                punishedEmbed.setDescription(`You are no longer muted on the server.`);
-                                                yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
+                                                unpunishedEmbed.setTitle("⚠️ User was unmuted");
+                                                unpunishedEmbed.setDescription(`You are no longer muted on the server.`);
+                                                yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [unpunishedEmbed] }));
                                             }
                                             catch (err) { }
-                                            punishedEmbed.setDescription(`${punished} has served their time and been unmuted on <t:${punishtime}:f>.`);
-                                            channel.send({ embeds: [punishedEmbed] });
+                                            unpunishedEmbed.setDescription(`${punished} has served their time and been unmuted on <t:${punishtime}:f>.`);
+                                            channel.send({ embeds: [unpunishedEmbed] });
                                         }), countDown);
                                         if (sent) {
                                             yield msgInt.editReply({
@@ -402,27 +419,24 @@ exports.default = {
                                 }
                             }
                             else if (!time) {
-                                try {
-                                    punishedEmbed.setTitle("You have been muted");
-                                    if (rsn) {
-                                        punishedEmbed.addField("Reason for mute", `${rsn}`);
-                                        yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                    }
-                                    else {
-                                        punishedEmbed.addField("Reason for mute", "No reason given");
-                                        yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
-                                    }
-                                    sent = true;
+                                punishedEmbed.setTitle("⚠️ You have been muted");
+                                if (rsn) {
+                                    punishedEmbed.addField("Reason for mute", `${rsn}`);
+                                    yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
                                 }
-                                catch (err) { }
+                                else {
+                                    punishedEmbed.addField("Reason for mute", "No reason given");
+                                    yield (punished === null || punished === void 0 ? void 0 : punished.send({ embeds: [punishedEmbed] }));
+                                }
+                                sent = true;
                                 yield punished.roles.add(muted.id).then(() => __awaiter(void 0, void 0, void 0, function* () {
-                                    punishedEmbed.setTitle("User was muted");
+                                    punishedEmbed.setTitle("⚠️ User was muted");
                                     if (rsn) {
                                         punishedEmbed.setDescription(`${punished} was muted on the server.`);
                                         channel.send({ embeds: [punishedEmbed] });
                                     }
                                     else {
-                                        punishedEmbed.setDescription(`${punished} was muted until because ${kicker} said they were behaving badly.`);
+                                        punishedEmbed.setDescription(`${punished} was muted because ${kicker} said they were behaving badly.`);
                                         channel.send({ embeds: [punishedEmbed] });
                                     }
                                     if (sent) {
@@ -446,8 +460,8 @@ exports.default = {
                         /////////////////////////////////////////////////////////////////////// BAN
                         case "ban":
                             //Waits for member kick then sends embed giving details
-                            yield ((_e = msgInt.guild) === null || _e === void 0 ? void 0 : _e.members.ban(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
-                                punishedEmbed.setTitle("User was banned");
+                            yield (guild === null || guild === void 0 ? void 0 : guild.members.ban(punished).then(() => __awaiter(void 0, void 0, void 0, function* () {
+                                punishedEmbed.setTitle("❗ | User was banned");
                                 punishedEmbed.setDescription(`${punished} was banned from the server`);
                                 //if a reason is included, else none
                                 if (rsn) {
@@ -458,7 +472,7 @@ exports.default = {
                                     punishedEmbed.addField("Reason for Ban", "No reason given");
                                     channel.send({ embeds: [punishedEmbed] });
                                 }
-                                yield (punished === null || punished === void 0 ? void 0 : punished.send(`You have been banned from the test server because: ${rsn}`).catch());
+                                yield (punished === null || punished === void 0 ? void 0 : punished.send(`❗ | You have been banned from the server because: ${rsn}`).catch());
                                 yield msgInt.editReply({
                                     content: "Completed.",
                                     components: [],
@@ -468,7 +482,7 @@ exports.default = {
                             return;
                     }
                 }
-                else if (((_f = collection.first()) === null || _f === void 0 ? void 0 : _f.customId) === "punish_no") {
+                else if (((_b = collection.first()) === null || _b === void 0 ? void 0 : _b.customId) === "punish_no") {
                     msgInt.editReply({
                         content: "Action cancelled",
                         components: [],
@@ -483,19 +497,19 @@ exports.default = {
                             components: [],
                         });
                         break;
-                    case `already muted`:
+                    case "already muted":
                         msgInt.editReply({
                             content: `${punished} is already muted.`,
                             components: [],
                         });
                         break;
-                    case `already banned`:
+                    case "already banned":
                         msgInt.editReply({
                             content: `${punished} is already banned.`,
                             components: [],
                         });
                         break;
-                    case `already kicked`:
+                    case "already kicked":
                         msgInt.editReply({
                             content: `${punished} is not in the server.`,
                             components: [],
@@ -513,7 +527,7 @@ exports.default = {
                             components: [timeRow],
                         });
                         break;
-                    case `no role`:
+                    case "no role":
                         msgInt.editReply({
                             content: `Muted role did not exist, created role. Please refer to documentation.`,
                             components: [helpRowMuteRole],

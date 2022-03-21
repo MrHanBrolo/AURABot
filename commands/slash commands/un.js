@@ -47,24 +47,14 @@ exports.default = {
             .setCustomId("mutedusers")
             .setPlaceholder("None Selected");
         const userRow = new discord_js_1.MessageActionRow();
-        const punishRow = new discord_js_1.MessageActionRow()
-            .addComponents(new discord_js_1.MessageButton()
-            .setCustomId("punish_yes")
-            .setLabel("Confirm")
-            .setStyle("SUCCESS"))
-            .addComponents(new discord_js_1.MessageButton()
-            .setCustomId("punish_no")
-            .setLabel("Cancel")
-            .setStyle("DANGER"));
         const filter = (btnInt) => {
             return msgInt.user.id === btnInt.user.id;
         };
         const unpunishedEmbed = new discord_js_1.MessageEmbed()
-            .setColor("#76b900")
-            .setAuthor(`Action performed by: ${kicker}`)
+            .setColor("#2BDE1F")
+            .setAuthor({ name: `Action performed by: ${kicker}` })
             .setTimestamp()
-            .setFooter("Remember to behave!");
-        console.log("verified input");
+            .setFooter({ text: "Remember to behave!" });
         try {
             switch (undo) {
                 case "mute":
@@ -119,11 +109,11 @@ exports.default = {
                                     users === null || users === void 0 ? void 0 : users.roles.remove(muted.id);
                                     let user = users === null || users === void 0 ? void 0 : users.displayName;
                                     unpunishedEmbed.addFields({
-                                        name: `User was unmuted`,
+                                        name: `✅ User was unmuted`,
                                         value: `${user} is no longer muted on the server`
                                     });
                                 }
-                                unpunishedEmbed.setDescription(`Action performed at <t:${unixTimestamp}:f>`);
+                                unpunishedEmbed.setDescription(`Action performed on <t:${unixTimestamp}:f>`);
                                 channel.send({ embeds: [unpunishedEmbed] });
                             }
                         }

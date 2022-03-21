@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const discord_js_1 = __importDefault(require("discord.js"));
-const welcome_schema_1 = __importDefault(require("../../models/welcome-schema"));
+const guild_schema_1 = __importDefault(require("../../models/guild-schema"));
 //module.exports = {}
 exports.default = {
     category: "Configuration",
@@ -55,7 +55,7 @@ exports.default = {
             //joins rest of words into a sentence
             text = args.join(" ");
         }
-        yield welcome_schema_1.default.findOneAndUpdate({ _id: guild.id }, { _id: guild.id, text, channelId: target.id }, { upsert: true });
+        yield guild_schema_1.default.findOneAndUpdate({ _id: guild.id }, { _id: guild.id, text, channelId: target.id }, { upsert: true });
         return "Welcome channel set!";
     }),
 };

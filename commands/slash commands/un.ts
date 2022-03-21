@@ -2,7 +2,6 @@ import {
   MessageComponentInteraction,
   MessageSelectMenu,
   MessageActionRow,
-  MessageButton,
   MessageEmbed,
 } from "discord.js";
 import { ICommand } from "wokcommands";
@@ -50,32 +49,15 @@ export default {
 
     const userRow = new MessageActionRow();
 
-    const punishRow = new MessageActionRow()
-
-      .addComponents(
-        new MessageButton()
-          .setCustomId("punish_yes")
-          .setLabel("Confirm")
-          .setStyle("SUCCESS")
-      )
-      .addComponents(
-        new MessageButton()
-          .setCustomId("punish_no")
-          .setLabel("Cancel")
-          .setStyle("DANGER")
-      );
-
     const filter = (btnInt: MessageComponentInteraction) => {
       return msgInt.user.id === btnInt.user.id;
     };
 
     const unpunishedEmbed = new MessageEmbed()
-      .setColor("#76b900")
-      .setAuthor(`Action performed by: ${kicker}`)
+      .setColor("#2BDE1F")
+      .setAuthor({name: `Action performed by: ${kicker}`})
       .setTimestamp()
-      .setFooter("Remember to behave!");
-
-    console.log("verified input");
+      .setFooter({text: "Remember to behave!"});
 
     try {
       switch (undo) {
@@ -136,12 +118,12 @@ export default {
                       let user = users?.displayName
                       unpunishedEmbed.addFields(
                         {
-                            name: `User was unmuted`,
+                            name: `✅ User was unmuted`,
                             value: `${user} is no longer muted on the server`
                         })
                     }
                     unpunishedEmbed.setDescription(
-                      `Action performed at <t:${unixTimestamp}:f>`
+                      `Action performed on <t:${unixTimestamp}:f>`
                     );
                     channel.send({ embeds: [unpunishedEmbed] });
                   }

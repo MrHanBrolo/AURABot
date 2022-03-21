@@ -1,10 +1,13 @@
 import DiscordJS, {Intents} from 'discord.js'
 import dotenv from 'dotenv'
+import mongoose from 'mongoose'
 
 dotenv.config()
 
 const fs = require('fs');
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
+
+mongoose.connect(process.env.MONGO_URI as string)
 
 
 const BOT = new DiscordJS.Client({
@@ -17,12 +20,6 @@ const BOT = new DiscordJS.Client({
       Intents.FLAGS.GUILD_PRESENCES
   ]    
 })
-
-function consolog(statement){
-  return console.log(statement)
-}
-
-
 
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);

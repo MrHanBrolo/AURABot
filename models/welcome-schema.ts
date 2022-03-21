@@ -1,4 +1,4 @@
-import mongoose, {Schema} from 'mongoose'
+import mongoose, {Schema, Types} from 'mongoose'
 
 const reqString = {
     type: String,
@@ -6,13 +6,13 @@ const reqString = {
 }
 
 const welcomeSchema = new Schema({
-    //Guild ID
-    _id: reqString,
+    guildId: {type: Schema.Types.ObjectId, ref: 'AURABot-Guilds'},
     text: reqString,
-    channelId: reqString,
+    channelId: reqString
 })
 
-const name = 'AURABot-Welcome'
+
+const name = 'AURABot-WelcomeSettings'
 
 // module.exports =
 export default mongoose.models[name] || 

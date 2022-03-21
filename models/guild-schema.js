@@ -20,17 +20,12 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const reqString = {
-    type: String,
-    required: true
-};
 const guildSchema = new mongoose_1.Schema({
-    //Guild ID
-    _id: reqString,
-    guildName: reqString,
-    children: [{}]
+    guildId: { type: mongoose_1.Schema.Types.String },
+    guildName: { type: mongoose_1.Schema.Types.String },
 });
 const name = 'AURABot-Guilds';
 // module.exports =
 exports.default = mongoose_1.default.models[name] ||
     mongoose_1.default.model(name, guildSchema, name);
+console.log(mongoose_1.default.connection.readyState);

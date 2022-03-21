@@ -1,19 +1,14 @@
-import mongoose, {Schema} from 'mongoose'
-
-const reqString = {
-    type: String,
-    required: true
-}
+import mongoose, { Schema } from 'mongoose'
 
 const guildSchema = new Schema({
-    //Guild ID
-    _id: reqString,
-    guildName: reqString,
-    children:[{}]
+    guildId: { type: Schema.Types.String },
+    guildName: { type: Schema.Types.String },
 })
 
 const name = 'AURABot-Guilds'
 
 // module.exports =
-export default mongoose.models[name] || 
+export default mongoose.models[name] ||
     mongoose.model(name, guildSchema, name)
+
+console.log(mongoose.connection.readyState)

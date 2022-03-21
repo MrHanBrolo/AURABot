@@ -97,11 +97,11 @@ exports.default = {
             return msgInt.user.id === btnInt.user.id;
         };
         // Embed for results
-        const unpunishedEmbed = new discord_js_1.MessageEmbed()
-            .setColor("#76b900")
-            .setAuthor(`Action performed by: ${invoker}`)
+        const permsEmbed = new discord_js_1.MessageEmbed()
+            .setColor("#FF9500")
+            .setAuthor({ name: `${invoker}` })
             .setTimestamp()
-            .setFooter("Remember to behave!");
+            .setFooter({ text: "Remember to behave!" });
         function changePerms(collector, channelChosen, mentionChosen, stateSet, whatsitdoin) {
             collector.on("end", (collection) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
@@ -122,24 +122,27 @@ exports.default = {
                                     const rP = removedPerms.join(" ● ").replace(/,/g, " ");
                                     if (userR instanceof discord_js_1.GuildMember) {
                                         const utag = userR.user.tag;
-                                        unpunishedEmbed.addFields({
+                                        permsEmbed.addFields({
                                             name: `Role / User Affected`,
                                             value: `${utag}`,
                                         });
                                     }
                                     if (userR instanceof discord_js_1.Role) {
                                         const rtag = userR.id;
-                                        unpunishedEmbed.addFields({
+                                        permsEmbed.addFields({
                                             name: `Role / User Affected`,
                                             value: `<@&${rtag}>`,
                                         });
                                     }
-                                    unpunishedEmbed.addFields({
+                                    permsEmbed.addFields({
                                         name: `${whatsitdoin} Permissions`,
                                         value: `Sucessfully ${whatsitdoin} the following perms: \n \n ${rP}`,
                                     });
-                                    unpunishedEmbed.setDescription(`Action performed on <t:${unixTimestamp}:f>`);
-                                    msgInt.editReply({ embeds: [unpunishedEmbed] });
+                                    permsEmbed.setDescription(`Action performed on <t:${unixTimestamp}:f>`);
+                                    msgInt.editReply({
+                                        content: " ",
+                                        embeds: [permsEmbed]
+                                    });
                                 }
                             }, i * 2000);
                         });
@@ -166,9 +169,9 @@ exports.default = {
                                     .setPlaceholder("None Selected");
                                 let check = userR.permissionsIn(selectedChannel);
                                 let checked = check.serialize();
-                                console.log(checked);
                             }
                             return;
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////////
                         case "edit":
                             if (userR instanceof discord_js_1.GuildMember) {
                                 if (permState !== "d" &&
@@ -187,13 +190,11 @@ exports.default = {
                                     selectedChannel = msgInt.channel;
                                 }
                                 const permHolder = new Array();
-                                const noPerms = new Array();
                                 const permsMenu = new discord_js_1.MessageSelectMenu()
                                     .setCustomId("perms")
                                     .setPlaceholder("None Selected");
                                 const perms = userR === null || userR === void 0 ? void 0 : userR.permissions.toArray();
                                 let check = userR.permissionsIn(selectedChannel);
-                                let checked = new discord_js_1.Permissions(check);
                                 for (let i = 0; i < perms.length; i++) {
                                     //Couldn't really figure out a better way to do this. Basically checks each permission value in the array and if it matches to one of this, adds it to the new noteablePerms array.
                                     if (perms[i] === "VIEW_CHANNEL" ||
@@ -210,7 +211,6 @@ exports.default = {
                                         perms[i] === "SEND_MESSAGES_IN_THREADS") {
                                         permHolder.push(perms[i]);
                                     }
-                                    console.log(permHolder);
                                 }
                                 yield permHolder.forEach((perm) => {
                                     permList.push({
@@ -229,11 +229,9 @@ exports.default = {
                                     max: 1,
                                     time: 1000 * 30,
                                 });
-                                console.log("made it to selection");
                                 yield msgInt.reply({
                                     content: "Choose what permissions to edit.",
                                     components: [permRow],
-                                    ephemeral: true,
                                     fetchReply: true,
                                 });
                                 if (permState === "deny" ||
@@ -272,6 +270,7 @@ exports.default = {
                                     .setCustomId("perms")
                                     .setPlaceholder("None Selected");
                                 const perms = userR === null || userR === void 0 ? void 0 : userR.permissions.toArray();
+                                console.log(perms);
                                 for (let i = 0; i < perms.length; i++) {
                                     //Couldn't really figure out a better way to do this. Basically checks each permission value in the array and if it matches to one of this, adds it to the new noteablePerms array.
                                     if (perms[i] === "VIEW_CHANNEL" ||
@@ -291,6 +290,7 @@ exports.default = {
                                         permHolder.push(perms[i]);
                                     }
                                 }
+                                ////////////////////////////////////////////////////////////////////////////////
                                 yield permHolder.forEach((perm) => {
                                     permList.push({
                                         label: `${perm}`,
@@ -308,7 +308,6 @@ exports.default = {
                                     max: 1,
                                     time: 1000 * 30,
                                 });
-                                console.log("made it to selection");
                                 yield msgInt.reply({
                                     content: "Choose what permissions to edit.",
                                     components: [permRow],
@@ -334,7 +333,6 @@ exports.default = {
             }
         }
         catch (error) {
-            console.log(error);
             switch (error) {
                 case "InvalidState":
                     msgInt.reply({

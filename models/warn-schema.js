@@ -24,12 +24,13 @@ const reqString = {
     type: String,
     required: true
 };
-const welcomeSchema = new mongoose_1.Schema({
-    guildId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'AURABot-Guilds' },
-    text: reqString,
-    channelId: reqString
+const warnSchema = new mongoose_1.Schema({
+    guildId: { type: mongoose_1.Schema.Types.String, ref: 'AURABot-Guilds' },
+    userId: { type: mongoose_1.Schema.Types.String, ref: 'AURABot-Users' },
+    reason: reqString,
+    staffId: reqString,
 });
-const name = 'AURABot-WelcomeSettings';
+const name = 'AURABot-Warns';
 // module.exports =
 exports.default = mongoose_1.default.models[name] ||
-    mongoose_1.default.model(name, welcomeSchema, name);
+    mongoose_1.default.model(name, warnSchema, name);

@@ -1,4 +1,4 @@
-import { GuildMember, MessageEmbed, MessageAttachment, Presence } from "discord.js";
+import { GuildMember, MessageEmbed, MessageAttachment, MessageComponentInteraction, MessageActionRow, MessageButton } from "discord.js";
 import { ICommand } from "wokcommands";
 import { Canvas, loadImage } from "skia-canvas"
 import  Str  from "@supercharge/strings"
@@ -53,7 +53,42 @@ export default {
       let pres
       
     
+      //FLIP BUTTON
+      const filter = (btnInt: MessageComponentInteraction) => {
+        return msgInt.user.id === btnInt.user.id;
+      }
 
+      const flipFrontRow = new MessageActionRow().addComponents(new MessageButton()
+            .setCustomId("flipFront")
+            .setLabel("Flip to Front")
+            .setStyle("PRIMARY")
+        )
+
+      const flipBackRow = new MessageActionRow().addComponents(new MessageButton()
+            .setCustomId("flipBack")
+            .setLabel("Flip to Back")
+            .setStyle("PRIMARY")
+        )
+
+      const flipDisabledBack = new MessageActionRow().addComponents(new MessageButton()
+              .setCustomId("flipDisabledBack")
+              .setLabel("Flip to Back")
+              .setStyle("PRIMARY")
+              .setDisabled()
+        )
+      
+      const flipDisabledFront = new MessageActionRow().addComponents(new MessageButton()
+        .setCustomId("flipDisabledFront")
+        .setLabel("Flip to Back")
+        .setStyle("PRIMARY")
+        .setDisabled()
+        )
+
+      const helpRowWhoIs = new MessageActionRow().addComponents(new MessageButton()
+            .setLabel("View Wiki Page")
+            .setStyle("LINK")
+            .setURL("https://github.com/MrHanBrolo/AURABot/wiki/Tools#whois")
+        )
 
       async function presence (){
         pres = await whois.presence?.status
@@ -137,7 +172,7 @@ export default {
 
       // node-canvas info setup
 
-      const canvas = new Canvas(700,250)
+      const mainCanvas = new Canvas(700,750)
       let bg
 
       const blurredRect = {
@@ -148,80 +183,124 @@ export default {
         spread: 7
       };
       
-      const ctx = canvas.getContext('2d')
+      const ctx = mainCanvas.getContext('2d')
         if(!userBg){
             bg = await loadImage('./wallpaper/AURABotWhoIsBG.png')
         } else {
             bg = await loadImage(userBg)
         }
       let presImg
-      ctx.drawImage(bg, 0, 0, canvas.width, canvas.height)
-      ctx.strokeStyle = '#FFFFFF'
-      ctx.lineWidth=7
-      ctx.strokeRect(0,0,canvas.width,canvas.height)
+
+      //Dark grey rect
+      ctx.strokeStyle = 'rgba(1, 1, 1, 0)'
+      ctx.lineWidth = 8
+      ctx.fillStyle = '#1B1B1B'
+  
+
+      ctx.beginPath()
+      ctx.moveTo(20, 10);              
+      ctx.lineTo(660, 10);             
+      ctx.arcTo(690, 10, 690, 70, 10);  
+      ctx.lineTo(690, 730);            
+      ctx.arcTo(690, 740, 680, 740, 10);
+      ctx.lineTo(20,740);
+      ctx.arcTo(10,740,10,730,10);
+      ctx.lineTo(10,20);
+      ctx.arcTo(10,10,20,10,10)
+      ctx.closePath()
+      ctx.stroke()
+      ctx.clip()
+
+      //Top of Card
+      ctx.fillRect(0,0,mainCanvas.width,mainCanvas.height)
+      ctx.drawImage(bg, 0, 0, 700, 250)
+
       ctx.fillStyle = 'rgba(35,39,42,0.75)'
       ctx.fillRect(130,21, 566, 208)
       ctx.filter = 'blur('+ blurredRect.spread +'px)';
-      ctx.drawImage(canvas,
+      ctx.drawImage(mainCanvas,
         blurredRect.x, blurredRect.y, blurredRect.width, blurredRect.height,
         blurredRect.x, blurredRect.y, blurredRect.width, blurredRect.height
       );
+      
+
+      // Profile pic outline 
+      ctx.lineWidth = 10
+      ctx.strokeStyle = '#FFFFFF'
       ctx.filter = 'none'
       ctx.beginPath()
-      ctx.lineWidth = 0
       ctx.arc(125 , 125, 100, 0.44, 1.195, true)
-      ctx.arcTo(125, 125, 185, 153, 35);  // Create an arc
+      ctx.arcTo(125, 125, 185, 153, 35);
       ctx.closePath() 
-      ctx.stroke()// Draw it
-
-
+      ctx.stroke()
       ctx.save()
       ctx.clip()
-
-
+      
 
       const avatar = await loadImage(userPic)
       ctx.drawImage(avatar, 25, 25, 200, 200)
-
+ 
+      //Profile Text
       ctx.restore()
-      ctx.arc(125 , 125, 100, 0.44, 1.195, true)     
-      ctx.arcTo(125, 125, 185, 153, 35); 
-      ctx.closePath() 
+
+
+
+      //Profile seperation line
+      ctx.lineWidth = 5
+      ctx.beginPath()
+      ctx.moveTo(0,250)
+      ctx.lineTo(700,250)
       ctx.stroke()
-      ctx.strokeStyle = '#FFFFFF'
-      ctx.lineWidth = 6
-      ctx.stroke()
+
+            //small rect
+            ctx.strokeStyle = '#383c3c'
+            ctx.fillStyle = '#383c3c'
+      
+            ctx.beginPath()
+            ctx.moveTo(40, 280);              
+            ctx.lineTo(660, 280);
+            ctx.arcTo(670, 280, 670, 350, 10);
+            ctx.lineTo(670, 410)
+            ctx.arcTo(670, 420, 660, 420,10)
+            ctx.lineTo(40,420)
+            ctx.arcTo(30,420,30,410,10)
+            ctx.lineTo(30,290)
+            ctx.arcTo(30,280,40,280,10)
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
 
       //Profile Text
-      ctx.font = '30px sans-serif';
+      ctx.font = '40px sans-serif';
       ctx.fillStyle = '#ffffff';
-      ctx.fillText('Profile', canvas.width / 3, canvas.height / 4);
+      ctx.fillText('Profile', mainCanvas.width / 3, mainCanvas.height / 9);
 
       //User tag text
-      ctx.font = applyText(canvas, whois.user.tag, 60)
-      ctx.fillText(whois.user.tag, canvas.width / 2.8, canvas.height / 2.3)
+      ctx.font = applyText(mainCanvas, whois.user.tag, 60)
+      ctx.fillText(whois.user.tag, mainCanvas.width / 2.9, mainCanvas.height / 5.8)
+
 
 
       //Presence icons
       switch(pres){
         case "dnd":
           presImg = await loadImage("https://i.imgur.com/loJ3Xb1.png")  
-          ctx.drawImage(presImg, 165, 168, 54, 54)
+          ctx.drawImage(presImg, 169, 173, 44, 44)
           break
 
         case "offline":
           presImg = await loadImage("https://i.imgur.com/UhQ3IW8.png")
-          ctx.drawImage(presImg,  165, 169, 54, 54)
+          ctx.drawImage(presImg,  169, 173, 44, 44)
           break
 
         case "idle":
           presImg = await loadImage("https://i.imgur.com/Ju8DKov.png")
-          ctx.drawImage(presImg,  165, 168, 54, 54)
+          ctx.drawImage(presImg,  169, 173, 44, 44)
           break
 
         case "online":
           presImg = await loadImage("https://i.imgur.com/Pup1yF6.png")
-          ctx.drawImage(presImg,  165, 168, 54, 54)
+          ctx.drawImage(presImg,  169, 173, 44, 44)
           break
       }
 
@@ -242,6 +321,7 @@ export default {
             })            
           })
           console.log(activities)
+          console.log(doing)
 
             const playing = await activities.find(a => a.type === "PLAYING")
             const listening = await activities.find(a => a.type === "LISTENING")
@@ -249,43 +329,45 @@ export default {
 
             // playing game
             if(playing && !listening && !custom){
+              ctx.drawImage(gam, mainCanvas.width/1.95,mainCanvas.height / 16.9, 44, 44)
               ctx.font = "18pt sans-serif"
-              wrapText(ctx,`Currently ${playing.type.toLowerCase()} ${playing.name}` ,canvas.width / 2.77, canvas.height / 1.8, canvas.width-300, 30)
+              wrapText(ctx,`Currently ${playing.type.toLowerCase()} ${playing.name}`, mainCanvas.width / 11.5, mainCanvas.height / 2.3, 650, 30)
             }
 
         
-
             // listening to music
             else if(listening && !playing && !custom){
-              ctx.drawImage(spl, canvas.width/2.2,canvas.height/7, 43.52, 32)
+              ctx.drawImage(spl, mainCanvas.width/2.03,mainCanvas.height / 13.4, 43.52, 32)
               ctx.font = "18pt sans-serif"
-              wrapText(ctx,`Listening to ${listening.details} by ${listening.state}` ,canvas.width / 2.77, canvas.height / 1.8, canvas.width-300, 30)
+              wrapText(ctx,`Listening to ${listening.details} by ${listening.state}`, mainCanvas.width / 11.5, mainCanvas.height / 2.3, 600, 30)
             }
 
             //custom status
             else if(custom && !listening && !playing){
               ctx.font = "18pt sans-serif"
-              wrapText(ctx,`Currently doing...in...on? ${custom.state}` ,canvas.width / 2.77, canvas.height / 1.8, canvas.width-300, 30)
+              wrapText(ctx,`Currently doing...in...on? ${custom.state}`, mainCanvas.width / 11.5, mainCanvas.height / 2.3, 650, 30)
             }
 
             //playing game and listening to music
             else if(playing && listening && !custom){
-              ctx.drawImage(spl, canvas.width/2.2,canvas.height/7, 43.52, 32)
+              ctx.drawImage(spl, mainCanvas.width/2.03,mainCanvas.height / 13.4, 43.52, 32)
+              ctx.drawImage(gam, mainCanvas.width/1.80,mainCanvas.height / 16.5, 44, 44)
               ctx.font = "18pt sans-serif"
-              wrapText(ctx,`Playing ${playing.name} and listening to ${listening.details} by ${listening.state}` ,canvas.width / 2.77, canvas.height / 1.8, canvas.width-300, 30)
+              wrapText(ctx,`Playing ${playing.name} and listening to ${listening.details} by ${listening.state}`, mainCanvas.width / 11.5, mainCanvas.height / 2.3, 620, 30)
             }
 
             //playing game and custom status
             else if(playing && custom && !listening){
               ctx.font = "18pt sans-serif"
-              wrapText(ctx,`Playing ${playing.name} and...doing...in..on? ${custom.state}` ,canvas.width / 2.77, canvas.height / 1.8, canvas.width-300, 30)
+              wrapText(ctx,`Playing ${playing.name} and...doing...in..on? ${custom.state}`, mainCanvas.width / 11.5, mainCanvas.height / 2.3, mainCanvas.width-50, 30)
             }
 
             //playing game and custom status and listening to music
             else if(playing && custom && listening){
-              ctx.drawImage(spl, canvas.width/2.2,canvas.height/7, 43.52, 32)
+              ctx.drawImage(spl, mainCanvas.width/2.03,mainCanvas.height / 13.4, 43.52, 32)
+              ctx.drawImage(gam, mainCanvas.width/1.80,mainCanvas.height / 16.5, 44, 44)
               ctx.font = "18pt sans-serif"
-              wrapText(ctx,`Playing ${playing.name}, ${custom.state} and listening to some music.` ,canvas.width / 2.77, canvas.height / 1.8, canvas.width-300, 30)
+              wrapText(ctx,`Playing ${playing.name}, ${custom.state} and listening to ${listening.details} by ${listening.state}.`, mainCanvas.width / 11.5, mainCanvas.height / 2.3, 620, 30)
             }
           }
 
@@ -303,13 +385,19 @@ export default {
       
       const roleCount = newRoles.split(" | ")
 
-      // Embed to display information
-      const whoisEmbed = new MessageEmbed()
-        .setColor("#330034")
+      //Embed to display card
+      const frontCard = new MessageEmbed()
+        .setColor("#2f3136")
+        .setTimestamp()
+        .setFooter("Collect 'em all!")
+
+      // Embed to display additional information
+      const backCard = new MessageEmbed()
+        .setColor("#2f3136")
         .setTimestamp()
         .setFooter(`Brought to you by @AURABot`)
 
-      whoisEmbed.addFields(
+      backCard.addFields(
         {
           name: "Date user joined 🕔",
           value: `<t:${joinedTimestamp}:f>`,
@@ -321,7 +409,7 @@ export default {
           inline: true,
         },
         {
-          name: `Roles the user has [${roleCount.length}] 🏷️`,
+          name: `This user has [${roleCount.length}] roles: 🏷️`,
           value: newRoles,
         }
       )
@@ -331,7 +419,8 @@ export default {
           Simply implemented, but this section will basically assign the highest level of privilege to a new field called "special"
           and list it.
 
-          */
+      */
+
       // Checks if server owner and sets rank to this
       if (whois.id === msgInt.guild?.ownerId) 
       {
@@ -350,7 +439,7 @@ export default {
           permCollection.indexOf("BAN_MEMBERS") >= 0
         ) {serverRank = "Moderator"}}
 
-      if (serverRank) {whoisEmbed.addField("Special", serverRank)}
+      if (serverRank) {backCard.addField("Special", serverRank)}
 
       //This section checks for the three notable main Discord perks and lists them in, what is in my opinion, the most prominent order
       //Partnered server owner
@@ -370,7 +459,7 @@ export default {
 
       if (noteableStatus.length > 0) {
         const noteableString = noteableStatus.join(" | ")
-        whoisEmbed.addFields({
+        backCard.addFields({
           name: "Notable Other",
           value: `${noteableString}`,})}
 
@@ -406,15 +495,52 @@ export default {
 
         const newView = permView.join(" ● ").replace(/,/g, " ")
 
-        whoisEmbed.addFields({
+        backCard.addFields({
           name: "Notable Permissions",
           value: `${newView}`,})}
 
-     const attachment = new MessageAttachment(await canvas.toBuffer(), 'profile-image.png')
+     const attachment = new MessageAttachment(await mainCanvas.toBuffer('png'), 'profile-image.png')
 
-      await msgInt.reply({embeds: [whoisEmbed], files: [attachment]})
+    frontCard
+    .setImage('attachment://profile-image.png')
+     
+     const collector = channel.createMessageComponentCollector({
+      filter,
+      time: 1000 * 45,
+    });
 
-    //  msgInt.followUp({embeds: [whoisEmbed]})
+  await msgInt.reply({files:[attachment], components: [flipBackRow, helpRowWhoIs]})
+    
+    collector.on("collect", i => {
+      if (i.user.id === msgInt.user.id) {
+        if (i.customId === "flipBack") {      
+          console.log("flipping to back")
+          i.update({embeds: [backCard], attachments:[], components: [flipFrontRow, helpRowWhoIs]})
+      }
+      if (i.customId === "flipFront"){
+          console.log("flipping to front")
+          i.update({files:[attachment], embeds:[], components: [flipBackRow, helpRowWhoIs]})
+      }
+     } else {
+        i.reply({ content: `These buttons aren't for you!`, ephemeral: true });
+      }
+    })
+    
+    collector.on("end", async (collection) => {
+      console.log(collection.last()?.customId)
+
+            if(collection.last()?.customId == "flipBack"){
+             await msgInt.editReply({embeds:[backCard], attachments:[], components: [flipDisabledFront, helpRowWhoIs]})
+            }
+
+            if(collection.last()?.customId == "flipFront"){
+             await msgInt.editReply({embeds: [], files:[attachment], components: [flipDisabledBack, helpRowWhoIs]})
+            }
+
+            if(collection.last() == undefined){
+             await msgInt.editReply({components: [flipDisabledBack, helpRowWhoIs]})
+            }
+    })
 
     } catch (error) {
       console.log(error)
