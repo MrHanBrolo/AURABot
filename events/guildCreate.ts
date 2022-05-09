@@ -1,4 +1,5 @@
 import guildSchema from "../models/guild-schema";
+import logSchema from "../models/logs-schema"
 
 module.exports = {
     name: 'guildCreate',
@@ -27,11 +28,24 @@ module.exports = {
                 {
                     guildId: id,
                     guildName: name,
-                    settings: [],
                     users: []
                 })
         }
 
+        /* 
+         * 
+         * 
+         * 
+         *          CREATE LOG SETTINGS
+         * 
+         * 
+         * 
+         * 
+        */
+        await logSchema.create({
+            guildId: guild ?.id,
+            logs: []
+        })
         /* 
          * 
          * 
@@ -42,8 +56,6 @@ module.exports = {
          * 
          * 
         */
-        
-        
 
         /* 
          * 
