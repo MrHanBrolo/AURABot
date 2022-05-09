@@ -23,6 +23,10 @@ const mongoose_1 = __importStar(require("mongoose"));
 const guildSchema = new mongoose_1.Schema({
     guildId: { type: mongoose_1.Schema.Types.String },
     guildName: { type: mongoose_1.Schema.Types.String },
+    logSettings: { type: mongoose_1.Schema.Types.ObjectId, ref: "AURABot-LogSettings" },
+    mutedRoleId: { type: mongoose_1.Schema.Types.String },
+    bansIssued: { type: mongoose_1.Schema.Types.Number, default: 0 },
+    casesMade: { type: mongoose_1.Schema.Types.Number, default: 0 }
 });
 const name = 'AURABot-Guilds';
 // module.exports =

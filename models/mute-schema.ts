@@ -1,4 +1,4 @@
-import mongoose, {isValidObjectId, Schema, Types} from 'mongoose'
+import mongoose, {Schema} from 'mongoose'
 
 const reqString = {
     type: String,
@@ -7,10 +7,11 @@ const reqString = {
 
 
 const muteSchema = new Schema({
-    guildId: {type: Schema.Types.ObjectId, ref: 'AURABot-Guilds'},
-    userId: {type: Schema.Types.ObjectId, ref: 'AURABot-Users'},
-    reason: reqString,
-    time: reqString,
+    guildId: {type: Schema.Types.String, ref: 'AURABot-Guilds'},
+    userId: reqString,
+    reason: String,
+    timeFrom: String,
+    timeUntil: String,
     staffId: reqString
 })
 

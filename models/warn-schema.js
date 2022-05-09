@@ -25,12 +25,13 @@ const reqString = {
     required: true
 };
 const warnSchema = new mongoose_1.Schema({
-    guildId: { type: mongoose_1.Schema.Types.String, ref: 'AURABot-Guilds' },
-    userId: { type: mongoose_1.Schema.Types.String, ref: 'AURABot-Users' },
+    guildId: reqString,
+    userId: { type: mongoose_1.Schema.Types.String, ref: "AURABot-Users" },
     reason: reqString,
     staffId: reqString,
+    caseId: reqString
 });
-const name = 'AURABot-Warns';
+const name = "AURABot-Warns";
 // module.exports =
 exports.default = mongoose_1.default.models[name] ||
     mongoose_1.default.model(name, warnSchema, name);

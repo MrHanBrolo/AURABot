@@ -1,4 +1,4 @@
-import mongoose, {isValidObjectId, Schema, Types} from 'mongoose'
+import mongoose, {Schema} from 'mongoose'
 
 const reqString = {
     type: String,
@@ -7,14 +7,15 @@ const reqString = {
 
 
 const warnSchema = new Schema({
-    guildId: {type: Schema.Types.String, ref: 'AURABot-Guilds'}, 
-    userId: {type: Schema.Types.String, ref: 'AURABot-Users'},
+    guildId: reqString, 
+    userId: {type:Schema.Types.String, ref: "AURABot-Users"},
     reason: reqString,
     staffId: reqString,
+    caseId: reqString
 })
 
 
-const name = 'AURABot-Warns'
+const name = "AURABot-Warns"
 
 // module.exports =
 export default mongoose.models[name] || 

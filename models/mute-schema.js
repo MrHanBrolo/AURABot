@@ -25,10 +25,11 @@ const reqString = {
     required: true
 };
 const muteSchema = new mongoose_1.Schema({
-    guildId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'AURABot-Guilds' },
-    userId: { type: mongoose_1.Schema.Types.ObjectId, ref: 'AURABot-Users' },
-    reason: reqString,
-    time: reqString,
+    guildId: { type: mongoose_1.Schema.Types.String, ref: 'AURABot-Guilds' },
+    userId: reqString,
+    reason: String,
+    timeFrom: String,
+    timeUntil: String,
     staffId: reqString
 });
 const name = 'AURABot-Mutes';

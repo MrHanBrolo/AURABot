@@ -25,15 +25,16 @@ const reqString = {
     required: true
 };
 const userSchema = new mongoose_1.Schema({
-    guild: [{ type: mongoose_1.Schema.Types.String, ref: 'AURABot-Guilds' }],
+    guild: reqString,
     userId: reqString,
-    userTag: reqString,
     messages: String,
-    warnings: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'AURABot-Warns' }],
+    warnings: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "AURABot-Warns" }],
+    warningAmount: { type: mongoose_1.Schema.Types.Number, default: 0 },
     mutes: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'AURABot-Mutes' }],
-    banned: String,
+    isBanned: { type: mongoose_1.Schema.Types.Boolean },
+    isMuted: { type: mongoose_1.Schema.Types.Boolean },
 });
-const name = 'AURABot-Users';
+const name = "AURABot-Users";
 // module.exports =
 exports.default = mongoose_1.default.models[name] ||
     mongoose_1.default.model(name, userSchema, name);
