@@ -16,7 +16,6 @@ export default {
     category: "Moderation",
     description: "Manages permissions for a role or user.",
     slash: true,
-    testOnly: true,
     options: [
         {
             name: "mentionable",

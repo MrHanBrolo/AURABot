@@ -15,7 +15,7 @@ export default {
     category: "Testing",
     description: "Moderation Tool for ban / kick / mute",
     slash: true,
-    testOnly: true,
+    testOnly: false,
     guildOnly: true,
     options: [
         {

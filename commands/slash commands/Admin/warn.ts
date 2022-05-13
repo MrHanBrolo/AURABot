@@ -8,13 +8,9 @@ import guildSchema from "../../../models/guild-schema"
 export default {
     category: 'Moderation',
     description: 'Warns a user',
-
     permissions: ['ADMINISTRATOR'],
     requireRoles: true,
-
     slash: true,
-
-    testOnly: true,
     guildOnly: true,
 
     options: [

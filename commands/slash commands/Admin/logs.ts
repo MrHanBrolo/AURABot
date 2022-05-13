@@ -18,7 +18,6 @@ export default {
     description: 'Shows logs for a user',
 
     slash: true,
-    testOnly: true,
     guildOnly: true,
     options: [
         {
@@ -116,15 +115,13 @@ export default {
         const filter = (btnInt: MessageComponentInteraction) => {
             return msgInt.user.id === btnInt.user.id
         };
-        //Menu collector for log selection
-        const menuCollector = channel.createMessageComponentCollector({
+
+        const menuLogChoice = channel.createMessageComponentCollector({
             componentType: "SELECT_MENU",
             filter,
             time: 1000 * 30,
             max: 1,
         });
-
-        // Check if log channel has been set, set if not, replace if yes, if the same then throw error.
 
         switch (options) {
             case 'channel':
@@ -204,7 +201,7 @@ export default {
                     fetchReply: true,
                     ephemeral: true
                 })
-                menuCollector.on("end", async (collection) => {
+                menuLogChoice.on("end", async (collection) => {
                     if (collection.first() ?.customId === "logs") {
                         let selectedLogChoice = collection.first();
                         if (selectedLogChoice ?.isSelectMenu()) {
@@ -377,7 +374,7 @@ export default {
                     ephemeral: true
                 })
 
-                menuCollector.on("end", async (collection) => {
+                menuLogChoice.on("end", async (collection) => {
                     if (collection.first() ?.customId === "logs") {
                         let myValues = collection.first();
                         if (myValues ?.isSelectMenu()) {

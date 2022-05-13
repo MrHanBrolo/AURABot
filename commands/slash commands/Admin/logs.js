@@ -104,14 +104,12 @@ exports.default = {
         const filter = (btnInt) => {
             return msgInt.user.id === btnInt.user.id;
         };
-        //Menu collector for log selection
-        const menuCollector = channel.createMessageComponentCollector({
+        const menuLogChoice = channel.createMessageComponentCollector({
             componentType: "SELECT_MENU",
             filter,
             time: 1000 * 30,
             max: 1,
         });
-        // Check if log channel has been set, set if not, replace if yes, if the same then throw error.
         switch (options) {
             case 'channel':
                 function channelCheckAndSetOne(logType, logsName) {
@@ -184,7 +182,7 @@ exports.default = {
                     fetchReply: true,
                     ephemeral: true
                 });
-                menuCollector.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
+                menuLogChoice.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
                     var _a;
                     if (((_a = collection.first()) === null || _a === void 0 ? void 0 : _a.customId) === "logs") {
                         let selectedLogChoice = collection.first();
@@ -326,7 +324,7 @@ exports.default = {
                     fetchReply: true,
                     ephemeral: true
                 });
-                menuCollector.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
+                menuLogChoice.on("end", (collection) => __awaiter(void 0, void 0, void 0, function* () {
                     var _b;
                     if (((_b = collection.first()) === null || _b === void 0 ? void 0 : _b.customId) === "logs") {
                         let myValues = collection.first();
