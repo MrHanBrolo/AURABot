@@ -14,7 +14,7 @@ exports.default = {
     category: "Moderation",
     description: "Unbans / Mutes a user.",
     slash: true,
-    testOnly: true,
+    testOnly: false,
     options: [
         {
             name: "ban",

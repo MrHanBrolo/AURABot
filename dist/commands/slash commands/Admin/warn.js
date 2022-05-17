@@ -23,7 +23,6 @@ exports.default = {
     permissions: ['ADMINISTRATOR'],
     requireRoles: true,
     slash: true,
-    testOnly: true,
     guildOnly: true,
     options: [
         {

@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently --kill-others \"nodemon index.ts\" \"tsc -w --skipLibCheck\""
+    "dev": "concurrently --kill-others \"nodemon index.ts\" \"tsc -w --skipLibCheck\"",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "npm run lint -- --fix"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +26,8 @@
     "wokcommands": "^1.5.3"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.25.0",
+    "@typescript-eslint/parser": "^5.25.0",
     "eslint": "^8.15.0",
     "typescript": "^4.4.3"
   }

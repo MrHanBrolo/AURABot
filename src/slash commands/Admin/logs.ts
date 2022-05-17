@@ -1,5 +1,5 @@
 import { ICommand } from 'wokcommands';
-import logSchema from "../../../models/logs-schema";
+import logSchema from "../../models/logs-schema";
 import {
     MessageActionRow,
     MessageButton,
@@ -9,9 +9,9 @@ import {
     TextChannel
 } from 'discord.js';
 import { ChannelTypes } from 'discord.js/typings/enums';
-import warnSchema from '../../../models/warn-schema';
-import muteSchema from '../../../models/mute-schema';
-import guildSchema from '../../../models/guild-schema';
+import warnSchema from '../../models/warn-schema';
+import muteSchema from '../../models/mute-schema';
+import guildSchema from '../../models/guild-schema';
 
 export default {
     category: 'Moderation',

@@ -13,7 +13,7 @@ module.exports = {
             commandsDir: path_1.default.join(__dirname, '../commands/'),
             typeScript: true,
             ignoreBots: true,
-            testServers: ['889924333387005992'],
+            botOwners: ['234885897743630336'],
             mongoUri: process.env.MONGO_URI
         });
         console.log(`Ready! Logged in as ${client.user.tag}`);

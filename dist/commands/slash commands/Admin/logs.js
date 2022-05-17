@@ -21,7 +21,6 @@ exports.default = {
     category: 'Moderation',
     description: 'Shows logs for a user',
     slash: true,
-    testOnly: true,
     guildOnly: true,
     options: [
         {
