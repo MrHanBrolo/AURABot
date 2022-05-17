@@ -1,9 +1,9 @@
 import { MessageEmbed, TextChannel } from "discord.js"
 import { ICommand } from "wokcommands"
-import warnSchema from "../../../models/warn-schema"
-import logSchema from "../../../models/logs-schema"
-import userSchema from "../../../models/user-schema"
-import guildSchema from "../../../models/guild-schema"
+import warnSchema from "../../../src/models/warn-schema"
+import logSchema from "../../../src/models/logs-schema"
+import userSchema from "../../../src/models/user-schema"
+import guildSchema from "../../../src/models/guild-schema"
 
 export default {
     category: 'Moderation',
