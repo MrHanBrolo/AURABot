@@ -10,6 +10,7 @@ export default {
   category: "Moderation",
   description: "Unbans / Mutes a user.",
   slash: true,
+  testOnly: false,
   options: [
     {
       name: "ban",
